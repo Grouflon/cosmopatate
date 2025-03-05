@@ -14,6 +14,7 @@ main :: ()
     root_directory: = tprint("%/..", exe_directory);
     set_working_directory(root_directory);
     context.logger = yae_logger;
+    log("working directory: %", get_working_directory());
 
     // Run application
     {
