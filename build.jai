@@ -96,6 +96,9 @@ build :: ()
         
         log("Compiling...");
         error_count: = 0;
+        resource_types: [..]*Type_Info_Struct;
+        generated_resource_types: = false;
+
         compiler_begin_intercept(w);
         add_build_file("src/main.jai", w);
         while true
@@ -103,15 +106,74 @@ build :: ()
             message: = compiler_wait_for_message();
             if message.kind == {
                 case .ERROR; error_count += 1;
-                case .COMPLETE;
+
+                case .TYPECHECKED;
                 {
-                    mc := cast(*Message_Complete) message;
-                    if mc.error_code != .NONE 
+                    mt := cast(*Message_Typechecked) message;
+                    for st: mt.structs
                     {
-                        error_count += 1;
+                        struct_type_info: = st.expression.defined_type;
+
+                        if is_subclass_of(struct_type_info, "Resource")
+                        {
+                            array_add(*resource_types, struct_type_info);
+                        }
                     }
-                    break;
                 }
+
+                case .PHASE;
+                {
+                    mp := cast(*Message_Phase) message;
+
+                    if mp.phase ==
+                    {
+                        case .TYPECHECKED_ALL_WE_CAN;
+                        {
+                            if !generated_resource_types
+                            {
+                                sb: String_Builder;
+                                init_string_builder(*sb);
+                                append(*sb, "resource_types: []*Type_Info_Struct = .[");
+                                for struct_type_info, i: resource_types
+                                {
+                                    if i > 0 append(*sb, ",");
+                                    append(*sb, tprint("type_info(%)", struct_type_info.name));
+                                }
+                                append(*sb, "];");
+
+                                add_build_string(builder_to_string(*sb), w);
+                                generated_resource_types = true;
+                            }
+                        }
+
+                        case .POST_WRITE_EXECUTABLE;
+                        {
+                            // Post compilation steps
+                            {
+                                if os_target ==
+                                {
+                                    case .WASM;
+                                    {
+                                        // Convert wasm64 to wasm32
+                                        wasm64_path: = tprint("./%1/%2%0064.wasm", BUILD_OUTPUT_DIRECTORY, BUILD_NAME);
+                                        wasm32_path: = tprint("./%1/%2.wasm", BUILD_OUTPUT_DIRECTORY, BUILD_NAME);
+                                        cmd := string.["./modules/yae/thirdparty/wasm64232.exe", "-o", wasm32_path, wasm64_path];
+                                        log("%", cmd);
+                                        run_command(..cmd, capture_and_return_output= true, print_captured_output= true);
+                                        file_delete(wasm64_path);
+                                    }
+
+                                    case .WINDOWS;
+                                    {
+                                        copy_file_if_newer("./modules/raylib/windows/raylib.dll", tprint("%/raylib.dll", BUILD_OUTPUT_DIRECTORY));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                case .COMPLETE; break;
             }
         }
         compiler_end_intercept(w);
@@ -121,48 +183,27 @@ build :: ()
             return;
         }
         log("Compilation completed without error :)");
-    }
 
-    // Post compilation steps
-    {
-        if os_target ==
+
+        // Run
+        if os_target == .WINDOWS
         {
-            case .WASM;
+            if debug
             {
-                // Convert wasm64 to wasm32
-                wasm64_path: = tprint("./%1/%2%0064.wasm", BUILD_OUTPUT_DIRECTORY, BUILD_NAME);
-                wasm32_path: = tprint("./%1/%2.wasm", BUILD_OUTPUT_DIRECTORY, BUILD_NAME);
-                cmd := string.["./modules/yae/thirdparty/wasm64232.exe", "-o", wasm32_path, wasm64_path];
-                log("%", cmd);
-                run_command(..cmd, capture_and_return_output= true, print_captured_output= true);
-                file_delete(wasm64_path);
+                cmd: []string = .[
+                    "remedybg", "-g", "-q",
+                    tprint("%.rdbg", BUILD_NAME),
+                ];
+                result, output_string: = run_command(..cmd, capture_and_return_output= true);
+                print("\n");
+                log(output_string);
             }
-
-            case .WINDOWS;
+            else if run
             {
-                copy_file_if_newer("./modules/raylib/windows/raylib.dll", tprint("%/raylib.dll", BUILD_OUTPUT_DIRECTORY));
+                process: Process;
+                args: []string = .["cmd", "/C", "start", get_absolute_path(exe_path)];
+                result: = create_process(*process, ..args, kill_process_if_parent_exits= false);
             }
-        }
-    }
-
-    // Run
-    if os_target == .WINDOWS
-    {
-        if debug
-        {
-            cmd: []string = .[
-                "remedybg", "-g", "-q",
-                tprint("%.rdbg", BUILD_NAME),
-            ];
-            result, output_string: = run_command(..cmd, capture_and_return_output= true);
-            print("\n");
-            log(output_string);
-        }
-        else if run
-        {
-            process: Process;
-            args: []string = .["cmd", "/C", "start", get_absolute_path(exe_path)];
-            result: = create_process(*process, ..args, kill_process_if_parent_exits= false);
         }
     }
 }

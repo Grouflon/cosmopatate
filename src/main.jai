@@ -30,12 +30,13 @@ main :: ()
         raylib_imgui_init();
         defer raylib_imgui_shutdown();
 
-        resource_manager_init("data");
+        resource_manager_init(resource_types, "data");
         defer resource_manager_shutdown();
 
         // Load data
         cosomonaut_aseprite, success: = resource_load(AsepriteFile, "./data/aseprite/cosmonaut.json");
         defer resource_unload(cosomonaut_aseprite);
+        resource_save_to_disk(cosomonaut_aseprite, "./data/aseprite/cosmonaut.json.res");
 
         // Loop
         while !rl.WindowShouldClose()
