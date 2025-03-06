@@ -35,9 +35,12 @@ main :: ()
         defer resource_manager_shutdown();
 
         // Load data
-        cosomonaut_aseprite, success: = resource_load(AsepriteFile, "./data/aseprite/cosmonaut.json");
+        cosomonaut_aseprite, success1: = resource_load(AsepriteFile, "./data/aseprite/cosmonaut.json");
         defer resource_unload(cosomonaut_aseprite);
+        cosomonaut_texture, success2: = resource_load(TextureFile, "./data/aseprite/cosmonaut.png");
+        defer resource_unload(cosomonaut_texture);
         resource_save_to_disk(cosomonaut_aseprite, "./data/aseprite/cosmonaut.json.res");
+        resource_save_to_disk(cosomonaut_texture, "./data/aseprite/cosmonaut.png.res");
 
         // Loop
         while !rl.WindowShouldClose()
