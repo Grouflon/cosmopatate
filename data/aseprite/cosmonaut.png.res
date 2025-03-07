@@ -13,8 +13,7 @@
 							0
 						]
 					},
-					"texture": {
-					}
+					"texture": 2642747690
 				},
 				"id": 4073682716,
 				"name": "cosmonaut 4.aseprite",
@@ -32,8 +31,7 @@
 							0
 						]
 					},
-					"texture": {
-					}
+					"texture": 2642747690
 				},
 				"id": 2127669304,
 				"name": "cosmonaut 5.aseprite",
@@ -51,8 +49,7 @@
 							0
 						]
 					},
-					"texture": {
-					}
+					"texture": 2642747690
 				},
 				"id": 740536266,
 				"name": "cosmonaut 1.aseprite",
@@ -70,8 +67,7 @@
 							0
 						]
 					},
-					"texture": {
-					}
+					"texture": 2642747690
 				},
 				"id": 145450080,
 				"name": "cosmonaut 3.aseprite",
@@ -89,8 +85,7 @@
 							0
 						]
 					},
-					"texture": {
-					}
+					"texture": 2642747690
 				},
 				"id": 2381825070,
 				"name": "cosmonaut 0.aseprite",
@@ -108,8 +103,7 @@
 							0
 						]
 					},
-					"texture": {
-					}
+					"texture": 2642747690
 				},
 				"id": 393708463,
 				"name": "cosmonaut 6.aseprite",
@@ -127,8 +121,7 @@
 							0
 						]
 					},
-					"texture": {
-					}
+					"texture": 2642747690
 				},
 				"id": 2012495633,
 				"name": "cosmonaut 2.aseprite",
