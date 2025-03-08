@@ -7,6 +7,7 @@ EditorState :: struct
     console_window_rect: IntRect = .{50, 80, 800, 600};
 
     resources_open: bool;
+    imgui_demo_open: bool;
 }
 editor_state : EditorState;
 editor_settings_save_requested: = false;
@@ -121,11 +122,10 @@ main :: ()
         {
             reset_temporary_storage();
             dt: = rl.GetFrameTime();
+            prev_editor_state: = editor_state;
 
-            if get_window_rect(rl.GetWindowHandle()) != editor_state.app_window_rect || get_window_rect(get_console_window_handle()) != editor_state.console_window_rect
-            {
-                editor_settings_save_requested = true;
-            }
+            editor_state.app_window_rect = get_window_rect(rl.GetWindowHandle());
+            editor_state.console_window_rect = get_window_rect(get_console_window_handle());
 
             // Update
             {
@@ -136,19 +136,24 @@ main :: ()
                 player_update(*player, dt);
                 viewport_update(*viewport);
 
-                // ImGui.ShowDemoWindow();
+                if (editor_state.imgui_demo_open)
+                {
+                    ImGui.ShowDemoWindow(*editor_state.imgui_demo_open);
+                }
 
                 if ImGui.BeginMainMenuBar()
                 {
                     if ImGui.BeginMenu("Windows")
                     {
                         ImGui.MenuItem("Resources", "", *editor_state.resources_open);
+                        ImGui.MenuItem("ImGui Demo", "", *editor_state.imgui_demo_open);
 
                         ImGui.EndMenu();
                     }
                 }
                 ImGui.EndMainMenuBar();
 
+                prev_resources_open: = editor_state.resources_open;
                 if editor_state.resources_open
                 {
                     if ImGui.Begin("Resources", *editor_state.resources_open)
@@ -161,7 +166,6 @@ main :: ()
                     ImGui.End();
                 }
             }
-
 
             // Draw
             {
@@ -186,6 +190,7 @@ main :: ()
                 rl.DrawFPS(rl.GetScreenWidth() - 90, 10);
             }
 
+            editor_settings_save_requested = memcmp(*prev_editor_state, *editor_state, size_of(EditorState)) != 0;
             if editor_settings_save_requested
             {
                 editor_settings_save_requested = false;
