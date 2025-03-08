@@ -3,9 +3,14 @@ DEBUG_MEMORY :: (OS != .WASM);
 
 EditorState :: struct
 {
+    app_window_rect: IntRect = .{0, 30, 800, 600};
+    console_window_rect: IntRect = .{50, 80, 800, 600};
+
     resources_open: bool;
 }
 editor_state : EditorState;
+editor_settings_save_requested: = false;
+EDITOR_SETTINGS_PATH :: "temp/editor_settings.json";
 
 // Player
 PlayerState :: struct
@@ -76,16 +81,25 @@ main :: ()
     context.logger = yae_logger;
     log("working directory: %", get_working_directory());
 
+
     // Run application
     {
         // Init Window
         window_flags: rl.ConfigFlags;
-        // window_flags |= .FLAG_WINDOW_RESIZABLE;
+        window_flags |= .FLAG_WINDOW_RESIZABLE;
         rl.InitWindow(800, 600, "cosmopatate");
         rl.SetWindowState(xx window_flags);
         rl.SetTargetFPS(60);
         rl.SetExitKey(.KEY_NULL);
         defer rl.CloseWindow();
+
+        // Set windows positions
+        if read_json_file(EDITOR_SETTINGS_PATH, *editor_state)
+        {
+            set_window_rect(rl.GetWindowHandle(), editor_state.app_window_rect);
+            set_window_rect(get_console_window_handle(), editor_state.console_window_rect);
+        }
+        
 
         // Init shit
         raylib_imgui_init();
@@ -106,16 +120,20 @@ main :: ()
         while !rl.WindowShouldClose()
         {
             reset_temporary_storage();
-
-            resource_manager_update();
-            
             dt: = rl.GetFrameTime();
-            raylib_imgui_new_frame(dt);
+
+            if get_window_rect(rl.GetWindowHandle()) != editor_state.app_window_rect || get_window_rect(get_console_window_handle()) != editor_state.console_window_rect
+            {
+                editor_settings_save_requested = true;
+            }
 
             // Update
             {
-                player_update(*player, dt);
+                resource_manager_update();
 
+                raylib_imgui_new_frame(dt);
+
+                player_update(*player, dt);
                 viewport_update(*viewport);
 
                 // ImGui.ShowDemoWindow();
@@ -162,10 +180,21 @@ main :: ()
                 rl.ClearBackground(rl.RED);
 
                 viewport_draw(viewport);
-                rl.DrawText("Congrats! You created your first window!", 190, 200, 20, rl.LIGHTGRAY);
+                rl.DrawText("Congrats! You created your first window!", rl.GetScreenWidth() / 2 - 190, 200, 20, rl.LIGHTGRAY);
 
                 raylib_imgui_render();
                 rl.DrawFPS(rl.GetScreenWidth() - 90, 10);
+            }
+
+            if editor_settings_save_requested
+            {
+                editor_settings_save_requested = false;
+
+                editor_state.app_window_rect = get_window_rect(rl.GetWindowHandle());
+                editor_state.console_window_rect = get_window_rect(get_console_window_handle());
+
+                make_directory_if_it_does_not_exist(get_directory(EDITOR_SETTINGS_PATH), true);
+                write_json_file(EDITOR_SETTINGS_PATH, *editor_state);
             }
         }
     }
@@ -188,6 +217,7 @@ main :: ()
 #import "Basic"()(MEMORY_DEBUGGER = DEBUG_MEMORY);
 #import "String";
 #import "System";
+#import "File";
 
 #import "Math";
 #import "yae";

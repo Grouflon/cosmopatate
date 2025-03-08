@@ -1,4 +1,6 @@
 .build
 bin
+temp
 *.sublime-workspace
+*.rdbg
 imgui.ini
