@@ -111,6 +111,7 @@ main :: ()
 
         // Load data
         cosomonaut_aseprite, success1: = resource_load(AsepriteFile, "./data/aseprite/cosmonaut.json");
+        resource_save_to_disk(cosomonaut_aseprite, "./data/aseprite/cosmonaut.json.res");
         defer resource_unload(cosomonaut_aseprite);
 
         player: PlayerState;
