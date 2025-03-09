@@ -96,6 +96,7 @@ build :: ()
         
         log("Compiling...");
         error_count: = 0;
+        error_code: u8 = 0;
         resource_types: [..]*Type_Info_Struct;
         generated_resource_types: = false;
 
@@ -173,11 +174,16 @@ build :: ()
                     }
                 }
 
-                case .COMPLETE; break;
+                case .COMPLETE;
+                {
+                    mc := cast(*Message_Complete) message;
+                    error_code = xx mc.error_code;
+                    break;
+                }
             }
         }
         compiler_end_intercept(w);
-        if error_count != 0
+        if error_count != 0 || error_code != 0
         {
             log(tprint("Compilation failed with % error% :@", error_count, ifx error_count > 1 then "s" else ""));
             return;
