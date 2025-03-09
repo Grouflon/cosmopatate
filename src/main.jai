@@ -228,4 +228,4 @@ main :: ()
 #import "Math";
 #import "yae";
 rl :: #import "raylib";
-ImGui :: #import "ImGui";
+ImGui :: #import,dir "../modules/yae/modules/ImGui";
