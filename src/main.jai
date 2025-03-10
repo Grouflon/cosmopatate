@@ -1,17 +1,30 @@
 // === Build Parameters ===
 DEBUG_MEMORY :: (OS != .WASM);
 
+// Editor
 EditorState :: struct
 {
-    app_window_rect: IntRect = .{0, 30, 800, 600};
-    console_window_rect: IntRect = .{50, 80, 800, 600};
+    app_window_rect: IntRect = .{0, 30, 800, 600}; @serialize
+    console_window_rect: IntRect = .{50, 80, 800, 600}; @serialize
 
-    resources_open: bool;
-    imgui_demo_open: bool;
+    resources_open: bool; @serialize
+    imgui_demo_open: bool; @serialize
+
+    animation_editor_open: bool; @serialize
 }
+
 editor_state : EditorState;
 editor_settings_save_requested: = false;
+DEFAULT_SERIALIZATION_PARAMS :: SerializationParams.{ filters = .[.{ .IN, type_info(EditorState), "serialize" }]};
 EDITOR_SETTINGS_PATH :: "temp/editor_settings.json";
+
+// Viewport
+viewport: PixelPerfectViewport = .{
+    min_render_width = 300,
+    min_render_height = 200,
+    min_pixel_ratio = 1,
+    max_pixel_ratio = 3,
+};
 
 // Player
 PlayerState :: struct
@@ -24,13 +37,6 @@ PlayerState :: struct
     idle_animation: *Animation;
     walk_animation: *Animation;
 }
-
-viewport: PixelPerfectViewport = .{
-    min_render_width = 300,
-    min_render_height = 200,
-    min_pixel_ratio = 1,
-    max_pixel_ratio = 3,
-};
 
 player_update :: (using player: *PlayerState, dt: float)
 {
@@ -73,6 +79,110 @@ player_draw :: (using player: *PlayerState)
     animation_player_draw(*animation_player, .{floor(x), 0}, flip);
 }
 
+// Animation Editor
+AnimationEditor :: struct
+{
+    player: AnimationPlayer;
+    viewport: PixelPerfectViewport = .{
+        min_render_width = 100,
+        min_render_height = 100,
+        min_pixel_ratio = 1,
+        max_pixel_ratio = 1,
+    };
+}
+animation_editor: AnimationEditor;
+
+animation_editor_init :: (using editor: *AnimationEditor, animation: *Animation)
+{
+    animation_player_set_animation(player, player.walk_animation);
+    
+}
+
+animation_editor_update :: (using editor: *AnimationEditor, dt: float)
+{
+    dockspace_id: = ImGui.GetID("animation_dockspace");
+    animation_editor_window_class: = ImGui.WindowClass.{ ClassId = dockspace_id };
+    dockspace_size: = ImGui.GetContentRegionAvail();
+
+    if ImGui.DockBuilderGetNode(dockspace_id) == null
+    {
+        ImGui.DockBuilderRemoveNode(dockspace_id); // Clear out existing layout
+        ImGui.DockBuilderAddNode(dockspace_id, cast(ImGui.DockNodeFlags) ImGui.DockNodeFlagsPrivate_.DockNodeFlags_DockSpace); // Add empty node
+        ImGui.DockBuilderSetNodeSize(dockspace_id, dockspace_size);
+
+        dock_main_id: = dockspace_id; // This variable will track the document node, however we are not using it here as we aren't docking anything into it.
+        dock_id_prop: = ImGui.DockBuilderSplitNode(dock_main_id, .ImGuiDir_Right, 0.20, null, *dock_main_id);
+        dock_id_bottom: = ImGui.DockBuilderSplitNode(dock_main_id, .ImGuiDir_Down, 0.20, null, *dock_main_id);
+
+        ImGui.DockBuilderDockWindow("Properties", dock_id_prop);
+        ImGui.DockBuilderDockWindow("Timeline", dock_id_bottom);
+        ImGui.DockBuilderDockWindow("Viewport", dock_main_id);
+        ImGui.DockBuilderFinish(dockspace_id);
+    }
+    else
+    {
+        ImGui.DockSpace(dockspace_id, *dockspace_size, window_class = *animation_editor_window_class);
+    }
+
+    ImGui.SetNextWindowClass(*animation_editor_window_class);
+    if ImGui.Begin("Properties", null)
+    {
+        ImGui.Text("props");
+    }
+    ImGui.End();
+
+    ImGui.SetNextWindowClass(*animation_editor_window_class);
+    if ImGui.Begin("Timeline", null)
+    {
+        if !player.is_playing
+        {
+            if ImGui.Button("Play")
+            {
+                animation_player_play(*player);
+            }
+        }
+        else
+        {
+            if ImGui.Button("Stop")
+            {
+                animation_player_stop(*player);
+            }
+        }
+        
+        ImGui.Text("time");
+    }
+    ImGui.End();
+
+    viewport_size: Vector2;
+    ImGui.SetNextWindowClass(*animation_editor_window_class);
+    if ImGui.Begin("Viewport", null)
+    {
+        viewport_size = ImGui.GetContentRegionAvail();
+        ImGui.Image(viewport.render_target.texture.id, viewport_size);
+
+        if ImGui.IsItemHovered()
+        {
+            viewport.camera.zoom += 0.5 * ImGui.GetIO().MouseWheel;
+            viewport.camera.zoom = clamp(viewport.camera.zoom, 0.5, 10.0);
+        }
+    }
+    ImGui.End();
+
+    animation_player_update(*player, dt);
+
+    // Draw viewport
+    viewport_update(*viewport, xx viewport_size.x, xx viewport_size.y);
+    viewport_begin_render(viewport);
+    defer viewport_end_render(viewport);
+
+    rl.ClearBackground(rl.LIGHTGRAY);
+    viewport_half_size: = viewport_size * 0.5;
+    rl.DrawLineV(.{-viewport_half_size.x, 0}, .{viewport_half_size.x, 0}, rl.RED);
+    rl.DrawLineV(.{0, -viewport_half_size.y}, .{0, viewport_half_size.x}, rl.GREEN);
+
+    animation_player_draw(*player, .{});
+}
+
 // === Main ===
 main :: ()
 {
@@ -81,7 +191,6 @@ main :: ()
     set_working_directory(root_directory);
     context.logger = yae_logger;
     log("working directory: %", get_working_directory());
-
 
     // Run application
     {
@@ -95,12 +204,11 @@ main :: ()
         defer rl.CloseWindow();
 
         // Set windows positions
-        if read_json_file(EDITOR_SETTINGS_PATH, *editor_state)
+        if read_json_file(EDITOR_SETTINGS_PATH, *editor_state, DEFAULT_SERIALIZATION_PARAMS)
         {
             set_window_rect(rl.GetWindowHandle(), editor_state.app_window_rect);
             set_window_rect(get_console_window_handle(), editor_state.console_window_rect);
         }
-        
 
         // Init shit
         raylib_imgui_init();
@@ -117,6 +225,9 @@ main :: ()
         player: PlayerState;
         player.idle_animation = get_animation(cosomonaut_aseprite, "idle");
         player.walk_animation = get_animation(cosomonaut_aseprite, "walk");
+
+        // Init animation editor
+        animation_editor_init(*animation_editor, player.walk_animation);
 
         // Loop
         while !rl.WindowShouldClose()
@@ -147,6 +258,7 @@ main :: ()
                     if ImGui.BeginMenu("Windows")
                     {
                         ImGui.MenuItem("Resources", "", *editor_state.resources_open);
+                        ImGui.MenuItem("Animation Editor", "", *editor_state.animation_editor_open);
                         ImGui.MenuItem("ImGui Demo", "", *editor_state.imgui_demo_open);
 
                         ImGui.EndMenu();
@@ -163,6 +275,15 @@ main :: ()
                         {
                             ImGui.Text(resource.name);
                         }
+                    }
+                    ImGui.End();
+                }
+
+                if editor_state.animation_editor_open
+                {
+                    if ImGui.Begin("Animation Editor", *editor_state.animation_editor_open)
+                    {
+                        animation_editor_update(*animation_editor, dt);
                     }
                     ImGui.End();
                 }
@@ -200,7 +321,7 @@ main :: ()
                 editor_state.console_window_rect = get_window_rect(get_console_window_handle());
 
                 make_directory_if_it_does_not_exist(get_directory(EDITOR_SETTINGS_PATH), true);
-                write_json_file(EDITOR_SETTINGS_PATH, *editor_state);
+                write_json_file(EDITOR_SETTINGS_PATH, *editor_state, DEFAULT_SERIALIZATION_PARAMS);
             }
         }
     }
