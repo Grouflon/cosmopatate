@@ -83,19 +83,15 @@ player_draw :: (using player: *PlayerState)
 AnimationEditor :: struct
 {
     player: AnimationPlayer;
-    viewport: PixelPerfectViewport = .{
-        min_render_width = 100,
-        min_render_height = 100,
-        min_pixel_ratio = 1,
-        max_pixel_ratio = 1,
-    };
+    viewport: ViewportBase;
+    is_dragging: = false;
 }
 animation_editor: AnimationEditor;
 
 animation_editor_init :: (using editor: *AnimationEditor, animation: *Animation)
 {
-    animation_player_set_animation(player, player.walk_animation);
-    
+    animation_player_set_animation(*player, animation);
+    viewport = .{};
 }
 
 animation_editor_update :: (using editor: *AnimationEditor, dt: float)
@@ -153,17 +149,52 @@ animation_editor_update :: (using editor: *AnimationEditor, dt: float)
     }
     ImGui.End();
 
-    viewport_size: Vector2;
     ImGui.SetNextWindowClass(*animation_editor_window_class);
     if ImGui.Begin("Viewport", null)
     {
-        viewport_size = ImGui.GetContentRegionAvail();
+        init_viewport: bool = viewport.render_target.id == 0;
+
+        viewport_size: = ImGui.GetContentRegionAvail();
+        viewport_screen_origin: = ImGui.GetCursorScreenPos();
+        viewport_update(*viewport, viewport_size);
         ImGui.Image(viewport.render_target.texture.id, viewport_size);
 
+        // Initialize
+        if init_viewport
+        {
+            i, frame: = animation_player_current_frame(*player);
+            sprite_size: = size(frame.sprite.bounds);
+
+            editor.viewport.target = .{100,100};
+            // viewport_align_points(*editor.viewport, viewport_size * 0.1, .{0, sprite_size.y}, viewport_size * 0.9, .{viewport_size.x, 0}, true);
+        }
+        else
+        {
+            viewport.size = viewport_size;
+        }
+
+        DRAG_BUTTON :: ImGui.MouseButton.Middle;
+        drag_button_pressed: = ImGui.IsMouseClicked(DRAG_BUTTON);
+        drag_button_down: = ImGui.IsMouseDown(DRAG_BUTTON);
+        mouse_viewport_position: = ImGui.GetIO().MousePos - viewport_screen_origin;
         if ImGui.IsItemHovered()
         {
-            viewport.camera.zoom += 0.5 * ImGui.GetIO().MouseWheel;
-            viewport.camera.zoom = clamp(viewport.camera.zoom, 0.5, 10.0);
+            ZOOM_STEP :: 0.5;
+            wanted_zoom: = clamp(editor.viewport.zoom + xy(ZOOM_STEP * ImGui.GetIO().MouseWheel), 0.5, 10.0);
+            viewport_set_zoom_focused(*editor.viewport, mouse_viewport_position, wanted_zoom);
+            if drag_button_pressed { editor.is_dragging = true; }
+        }
+
+        if !drag_button_down
+        {
+            editor.is_dragging = false;
+        }
+
+        if editor.is_dragging
+        {
+            d: = ImGui.GetMouseDragDelta(DRAG_BUTTON, 0);
+            ImGui.ResetMouseDragDelta(DRAG_BUTTON);
+            viewport_pan(*editor.viewport, d);
         }
     }
     ImGui.End();
@@ -171,14 +202,37 @@ animation_editor_update :: (using editor: *AnimationEditor, dt: float)
     animation_player_update(*player, dt);
 
     // Draw viewport
-    viewport_update(*viewport, xx viewport_size.x, xx viewport_size.y);
-    viewport_begin_render(viewport);
-    defer viewport_end_render(viewport);
+    viewport_begin_render(*editor.viewport);
+    defer viewport_end_render(*editor.viewport);
 
     rl.ClearBackground(rl.LIGHTGRAY);
-    viewport_half_size: = viewport_size * 0.5;
-    rl.DrawLineV(.{-viewport_half_size.x, 0}, .{viewport_half_size.x, 0}, rl.RED);
-    rl.DrawLineV(.{0, -viewport_half_size.y}, .{0, viewport_half_size.x}, rl.GREEN);
+
+    // Draw Grid
+    {
+        GRID_STEP :: 100.0;
+        viewport_min: = viewport_to_world_position(*editor.viewport, .{0, editor.viewport.size.y});
+        viewport_max: = viewport_to_world_position(*editor.viewport, .{editor.viewport.size.x, 0});
+        viewport_range: = viewport_max - viewport_min;
+        viewport_start: = viewport_min - .{fmod_cycling(viewport_min.x, GRID_STEP), fmod_cycling(viewport_min.y, GRID_STEP)};
+        cells_count_h: = floor_to_s32(viewport_range.x / GRID_STEP) + 1;
+        cells_count_v: = floor_to_s32(viewport_range.y / GRID_STEP) + 1;
+
+        // Vertical lines
+        for i: 0.. cells_count_h
+        {
+            start: = viewport_start + .{xx i * GRID_STEP, 0};
+            color: = ifx abs(start.x) < rl.EPSILON then rl.GREEN else rl.GRAY;
+            rl.DrawLineV(start, .{start.x, viewport_max.y}, color);
+        }
+
+        // Horizontal lines
+        for i: 0.. cells_count_v
+        {
+            start: = viewport_start + .{0, xx i * GRID_STEP};
+            color: = ifx abs(start.y) < rl.EPSILON then rl.RED else rl.GRAY;
+            rl.DrawLineV(start, .{viewport_max.x, start.y}, color);
+        }
+    }
 
     animation_player_draw(*player, .{});
 }
