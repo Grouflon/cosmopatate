@@ -2,10 +2,12 @@
 DEBUG_MEMORY :: (OS != .WASM);
 
 // Editor
+debugger_handle : *void;
 EditorState :: struct
 {
     app_window_rect: IntRect = .{0, 30, 800, 600}; @serialize
     console_window_rect: IntRect = .{50, 80, 800, 600}; @serialize
+    debugger_window_rect: IntRect = .{50, 80, 800, 600}; @serialize
 
     resources_open: bool; @serialize
     imgui_demo_open: bool; @serialize
@@ -240,6 +242,7 @@ animation_editor_update :: (using editor: *AnimationEditor, dt: float)
 // === Main ===
 main :: ()
 {
+    debugger_handle = find_window_by_title_containing("RemedyBG");
     exe_directory: = path_strip_filename(get_path_of_running_executable());
     root_directory: = tprint("%/..", exe_directory);
     set_working_directory(root_directory);
@@ -262,6 +265,7 @@ main :: ()
         {
             set_window_rect(rl.GetWindowHandle(), editor_state.app_window_rect);
             set_window_rect(get_console_window_handle(), editor_state.console_window_rect);
+            set_window_rect(debugger_handle, editor_state.debugger_window_rect);
         }
 
         // Init shit
@@ -292,6 +296,7 @@ main :: ()
 
             editor_state.app_window_rect = get_window_rect(rl.GetWindowHandle());
             editor_state.console_window_rect = get_window_rect(get_console_window_handle());
+            editor_state.debugger_window_rect = get_window_rect(debugger_handle);
 
             // Update
             {
@@ -370,10 +375,6 @@ main :: ()
             if editor_settings_save_requested
             {
                 editor_settings_save_requested = false;
-
-                editor_state.app_window_rect = get_window_rect(rl.GetWindowHandle());
-                editor_state.console_window_rect = get_window_rect(get_console_window_handle());
-
                 make_directory_if_it_does_not_exist(get_directory(EDITOR_SETTINGS_PATH), true);
                 write_json_file(EDITOR_SETTINGS_PATH, *editor_state, DEFAULT_SERIALIZATION_PARAMS);
             }
