@@ -33,25 +33,27 @@ main :: ()
         }
 
         // Init shit
-        imgui_config: RaylibImGuiConfig;
-        imgui_config.fonts = .[
-            .{
-                // path = "./data/fonts/Font Awesome 6 Free-Regular-400.otf",
-                path = "./data/fonts/Font Awesome 6 Free-Solid-900.otf",
-                size = 14,
-                range = .[0xf000, 0xf2e0],
-                config = .{
-                    FontDataOwnedByAtlas = true,
-                    MergeMode = true,
-                    OversampleH = 2,
-                    OversampleV = 1,
-                    RasterizerMultiply = 1.0,
-                    RasterizerDensity = 1.0,
-                    GlyphMaxAdvanceX = FLOAT32_MAX,
-                    GlyphOffset = .{0, 2}
+        imgui_config: RaylibImGuiConfig = .{
+            theme = .DARK,
+            fonts = .[
+                .{
+                    // path = "./data/fonts/Font Awesome 6 Free-Regular-400.otf",
+                    path = "./data/fonts/Font Awesome 6 Free-Solid-900.otf",
+                    size = 14,
+                    range = .[0xf000, 0xf2e0],
+                    config = .{
+                        FontDataOwnedByAtlas = true,
+                        MergeMode = true,
+                        OversampleH = 2,
+                        OversampleV = 1,
+                        RasterizerMultiply = 1.0,
+                        RasterizerDensity = 1.0,
+                        GlyphMaxAdvanceX = FLOAT32_MAX,
+                        GlyphOffset = .{0, 2}
+                    }
                 }
-            }
-        ];
+            ],
+        };
 
         raylib_imgui_init(imgui_config);
         defer raylib_imgui_shutdown();
@@ -296,6 +298,10 @@ animation_editor_update :: (using editor: *AnimationEditor, dt: float)
     animation_editor_window_class: = ImGui.WindowClass.{ ClassId = dockspace_id };
     dockspace_size: = ImGui.GetContentRegionAvail();
 
+    properties_name: *u8 = "\uf03a Properties";
+    timeline_name: *u8 = "\uf008 Timeline";
+    viewport_name: *u8 = "Viewport";
+
     if ImGui.DockBuilderGetNode(dockspace_id) == null
     {
         ImGui.DockBuilderRemoveNode(dockspace_id); // Clear out existing layout
@@ -306,9 +312,9 @@ animation_editor_update :: (using editor: *AnimationEditor, dt: float)
         dock_id_prop: = ImGui.DockBuilderSplitNode(dock_main_id, .ImGuiDir_Right, 0.20, null, *dock_main_id);
         dock_id_bottom: = ImGui.DockBuilderSplitNode(dock_main_id, .ImGuiDir_Down, 0.20, null, *dock_main_id);
 
-        ImGui.DockBuilderDockWindow("Properties", dock_id_prop);
-        ImGui.DockBuilderDockWindow("Timeline", dock_id_bottom);
-        ImGui.DockBuilderDockWindow("Viewport", dock_main_id);
+        ImGui.DockBuilderDockWindow(properties_name, dock_id_prop);
+        ImGui.DockBuilderDockWindow(timeline_name, dock_id_bottom);
+        ImGui.DockBuilderDockWindow(viewport_name, dock_main_id);
         ImGui.DockBuilderFinish(dockspace_id);
     }
     else
@@ -317,21 +323,21 @@ animation_editor_update :: (using editor: *AnimationEditor, dt: float)
     }
 
     ImGui.SetNextWindowClass(*animation_editor_window_class);
-    if ImGui.Begin("Properties", null)
+    if ImGui.Begin(properties_name, null)
     {
         ImGui.Text("props");
     }
     ImGui.End();
 
     ImGui.SetNextWindowClass(*animation_editor_window_class);
-    if ImGui.Begin("Timeline", null)
+    if ImGui.Begin(timeline_name, null)
     {
         ImGui.Text("time");
     }
     ImGui.End();
 
     ImGui.SetNextWindowClass(*animation_editor_window_class);
-    if ImGui.Begin("Viewport", null)
+    if ImGui.Begin(viewport_name, null)
     {
         init_viewport: bool = viewport.render_target.id == 0;
 
@@ -380,15 +386,15 @@ animation_editor_update :: (using editor: *AnimationEditor, dt: float)
 
         controls_size: = Vector2.{71, 0};
         ImGui.SetCursorPos(.{(viewport_size.x - controls_size.x) * 0.5 + 9, viewport_size.y - controls_size.y - 10});
-        ImGui.PushStyleColor(.ImGuiCol_ChildBg, ImGui.GetStyleColorVec4(.ImGuiCol_FrameBg));
+        ImGui.PushStyleColor(.ImGuiCol_ChildBg, Vector4.{0,0,0, 0.7});
         ImGui.PushStyleVar(.WindowPadding, xy(2));
-        ImGui.PushStyleVar(.WindowRounding, 2);
+        ImGui.PushStyleVar(.ChildRounding, 4);
         if ImGui.BeginChild("controls", controls_size, .AlwaysUseWindowPadding | .AutoResizeY)
         {
             // rewind
             if ImGui.Button("\uf049")
             {
-
+                animation_player_set_frame(*player, 0);
             }
             ImGui.SameLine(0, 2);
 
@@ -412,7 +418,7 @@ animation_editor_update :: (using editor: *AnimationEditor, dt: float)
             // unwind
             if ImGui.Button("\uf050")
             {
-                
+                animation_player_set_frame(*player, xx (player.current_animation.frames.count - 1));
             }
         }
         ImGui.EndChild();
