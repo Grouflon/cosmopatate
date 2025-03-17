@@ -25,9 +25,11 @@ main :: ()
         // Set windows positions
         if read_json_file(EDITOR_SETTINGS_PATH, *editor_state, DEFAULT_SERIALIZATION_PARAMS)
         {
-            set_window_rect(rl.GetWindowHandle(), editor_state.app_window_rect);
-            set_window_rect(get_console_window_handle(), editor_state.console_window_rect);
-            set_window_rect(debugger_handle, editor_state.debugger_window_rect);
+            console_handle: = get_console_window_handle();
+
+            if editor_state.app_window_rect != IntRect.{} { set_window_rect(rl.GetWindowHandle(), editor_state.app_window_rect); }
+            if editor_state.console_window_rect != IntRect.{} { set_window_rect(get_console_window_handle(), editor_state.console_window_rect); }
+            if editor_state.debugger_window_rect != IntRect.{} { set_window_rect(debugger_handle, editor_state.debugger_window_rect); }
         }
 
         // Init shit
@@ -76,10 +78,12 @@ main :: ()
             dt: = rl.GetFrameTime();
             prev_editor_state: = editor_state;
 
-            editor_state.app_window_rect = get_window_rect(rl.GetWindowHandle());
-            editor_state.console_window_rect = get_window_rect(get_console_window_handle());
-            editor_state.debugger_window_rect = get_window_rect(debugger_handle);
+            console_handle: = get_console_window_handle();
 
+            { success, rect: = get_window_rect(rl.GetWindowHandle());           if success editor_state.app_window_rect = rect; }
+            { success, rect: = get_window_rect(get_console_window_handle());    if success editor_state.console_window_rect = rect; }
+            { success, rect: = get_window_rect(debugger_handle);                if success editor_state.debugger_window_rect = rect; }
+            
             // Update
             {
                 resource_manager_update();
