@@ -71,7 +71,10 @@ main :: ()
         player.walk_animation = get_animation(cosomonaut_aseprite, "walk");
 
         // Init animation editor
-        animation_editor_init(*animation_editor, player.walk_animation);
+        animation, success2: = resource_load(Animation, "./data/animations/test.res");
+        defer resource_unload(animation);
+        resource_save_to_disk(animation, "./data/animations/test.res");
+        animation_editor_init(*animation_editor, animation);
 
         // Loop
         while !rl.WindowShouldClose()
