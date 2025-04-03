@@ -99,6 +99,8 @@ build :: ()
         error_code: u8 = 0;
         resource_types: [..]*Type_Info_Struct;
         generated_resource_types: = false;
+        generated_custom_serialize: = false;
+        custom_serialize_table: Table(*Type_Info_Struct, string);
 
         compiler_begin_intercept(w);
         add_build_file("src/main.jai", w);
@@ -118,6 +120,12 @@ build :: ()
                         if is_subclass_of(struct_type_info, "Resource")
                         {
                             array_add(*resource_types, struct_type_info);
+                        }
+
+                        found, args: = has_note_with_args(struct_type_info, "custom_serialize");
+                        if found && args.count > 0
+                        {
+                            table_add(*custom_serialize_table, struct_type_info, args[0]);
                         }
                     }
                 }
@@ -144,6 +152,24 @@ build :: ()
 
                                 add_build_string(builder_to_string(*sb), w);
                                 generated_resource_types = true;
+                            }
+
+                            if !generated_custom_serialize
+                            {
+                                sb: String_Builder;
+                                init_string_builder(*sb);
+                                append(*sb, "custom_serialize_types: []CustomSerializeType = .[");
+                                i: = 0;
+                                for function_name, ti: custom_serialize_table
+                                {
+                                    if i > 0 append(*sb, ",");
+                                    append(*sb, tprint(".{ti=type_info(%), function=%}", ti.name, function_name));
+                                    i+=1;
+                                }
+                                append(*sb, "];");
+
+                                add_build_string(builder_to_string(*sb), w);
+                                generated_custom_serialize = true;
                             }
                         }
 
@@ -219,4 +245,5 @@ build :: ()
 #import "File_Utilities";
 #import "Compiler";
 #import "Process";
+#import "Hash_Table";
 #import "yae";

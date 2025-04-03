@@ -55,10 +55,13 @@ main :: ()
             ],
         };
 
+        serialization_manager_init(custom_serialize_types); // custom_serialize_types is generated at build time. See build.jai
+        defer serialization_manager_shutdown();
+
         raylib_imgui_init(imgui_config);
         defer raylib_imgui_shutdown();
 
-        resource_manager_init(resource_types, "data");
+        resource_manager_init(resource_types, "data"); // resource_types is generated at build time. See build.jai
         defer resource_manager_shutdown();
 
         // Load data
