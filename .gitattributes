@@ -1,0 +1,4 @@
+* text=auto
+
+*.res text eol=lf
+*.json text eol=lf
