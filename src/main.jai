@@ -138,10 +138,7 @@ main :: ()
                 {
                     if ImGui.Begin("Resources", *editor_state.resources_open)
                     {
-                        for resource : resource_manager().resources
-                        {
-                            ImGui.Text(resource.name);
-                        }
+                        resource_browser_update();
                     }
                     ImGui.End();
                 }
