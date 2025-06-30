@@ -6,7 +6,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 2592393654
+					"sprite": 1800418174
 				},
 				"type": "SPRITE"
 			},
@@ -15,7 +15,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 90633333
+					"sprite": 520903033
 				},
 				"type": "SPRITE"
 			},
@@ -24,7 +24,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 879166174
+					"sprite": 1831732863
 				},
 				"type": "SPRITE"
 			},
@@ -33,7 +33,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 13551648
+					"sprite": 3775391287
 				},
 				"type": "SPRITE"
 			}

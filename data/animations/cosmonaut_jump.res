@@ -6,7 +6,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 3143913668
+					"sprite": 2522845946
 				},
 				"type": "SPRITE"
 			},
@@ -15,7 +15,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 2925257607
+					"sprite": 1765713566
 				},
 				"type": "SPRITE"
 			}

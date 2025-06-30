@@ -5,6 +5,24 @@
 				"data": {
 					"bounds": {
 						"max": [
+							0,
+							0
+						],
+						"min": [
+							0,
+							0
+						]
+					},
+					"texture": 1944163123
+				},
+				"id": 2404452184,
+				"name": "cosmonaut 13.aseprite",
+				"type": "Sprite"
+			},
+			{
+				"data": {
+					"bounds": {
+						"max": [
 							32,
 							32
 						],
@@ -13,11 +31,9 @@
 							0
 						]
 					},
-					"id": 2889019666,
-					"name": "cosmonaut 4.aseprite",
 					"texture": 1944163123
 				},
-				"id": 2889019666,
+				"id": 2922764127,
 				"name": "cosmonaut 4.aseprite",
 				"type": "Sprite"
 			},
@@ -33,11 +49,9 @@
 							0
 						]
 					},
-					"id": 3421269296,
-					"name": "cosmonaut 7.aseprite",
 					"texture": 1944163123
 				},
-				"id": 3421269296,
+				"id": 3012331176,
 				"name": "cosmonaut 7.aseprite",
 				"type": "Sprite"
 			},
@@ -53,11 +67,9 @@
 							0
 						]
 					},
-					"id": 2592393654,
-					"name": "cosmonaut 8.aseprite",
 					"texture": 1944163123
 				},
-				"id": 2592393654,
+				"id": 1800418174,
 				"name": "cosmonaut 8.aseprite",
 				"type": "Sprite"
 			},
@@ -73,11 +85,9 @@
 							0
 						]
 					},
-					"id": 90633333,
-					"name": "cosmonaut 9.aseprite",
 					"texture": 1944163123
 				},
-				"id": 90633333,
+				"id": 520903033,
 				"name": "cosmonaut 9.aseprite",
 				"type": "Sprite"
 			},
@@ -93,11 +103,9 @@
 							0
 						]
 					},
-					"id": 879166174,
-					"name": "cosmonaut 10.aseprite",
 					"texture": 1944163123
 				},
-				"id": 879166174,
+				"id": 1831732863,
 				"name": "cosmonaut 10.aseprite",
 				"type": "Sprite"
 			},
@@ -113,11 +121,9 @@
 							0
 						]
 					},
-					"id": 13551648,
-					"name": "cosmonaut 11.aseprite",
 					"texture": 1944163123
 				},
-				"id": 13551648,
+				"id": 3775391287,
 				"name": "cosmonaut 11.aseprite",
 				"type": "Sprite"
 			},
@@ -133,11 +139,9 @@
 							0
 						]
 					},
-					"id": 3143913668,
-					"name": "cosmonaut 12.aseprite",
 					"texture": 1944163123
 				},
-				"id": 3143913668,
+				"id": 2522845946,
 				"name": "cosmonaut 12.aseprite",
 				"type": "Sprite"
 			},
@@ -153,11 +157,9 @@
 							0
 						]
 					},
-					"id": 2925257607,
-					"name": "cosmonaut 13.aseprite",
 					"texture": 1944163123
 				},
-				"id": 2925257607,
+				"id": 1765713566,
 				"name": "cosmonaut 13.aseprite",
 				"type": "Sprite"
 			}

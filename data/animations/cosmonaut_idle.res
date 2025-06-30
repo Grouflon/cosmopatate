@@ -6,7 +6,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 2889019666
+					"sprite": 2922764127
 				},
 				"type": "SPRITE"
 			},
@@ -15,7 +15,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 2889019666
+					"sprite": 2922764127
 				},
 				"type": "SPRITE"
 			},
@@ -24,7 +24,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 2889019666
+					"sprite": 2922764127
 				},
 				"type": "SPRITE"
 			},
@@ -33,7 +33,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 2889019666
+					"sprite": 2922764127
 				},
 				"type": "SPRITE"
 			},
@@ -42,7 +42,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 2889019666
+					"sprite": 2922764127
 				},
 				"type": "SPRITE"
 			},
@@ -51,7 +51,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 3421269296
+					"sprite": 3012331176
 				},
 				"type": "SPRITE"
 			},
@@ -60,7 +60,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 3421269296
+					"sprite": 3012331176
 				},
 				"type": "SPRITE"
 			},
@@ -69,7 +69,7 @@
 				"end": -1,
 				"layer_index": 0,
 				"sprite": {
-					"sprite": 3421269296
+					"sprite": 3012331176
 				},
 				"type": "SPRITE"
 			}
