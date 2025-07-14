@@ -1,48 +1,51 @@
 {
 	"data": {
-		"events": [
+		"frame_count": 4,
+		"frames_per_second": 10,
+		"sprite_events": [
 			{
 				"begin": 0,
-				"end": -1,
-				"layer_index": 0,
-				"sprite": {
-					"sprite": 1800418174
-				},
-				"type": "SPRITE"
+				"end": 0,
+				"flip_x": false,
+				"flip_y": false,
+				"offset": [
+					0,
+					0
+				],
+				"sprite": 1800418174
 			},
 			{
 				"begin": 1,
-				"end": -1,
-				"layer_index": 0,
-				"sprite": {
-					"sprite": 520903033
-				},
-				"type": "SPRITE"
+				"end": 1,
+				"flip_x": false,
+				"flip_y": false,
+				"offset": [
+					0,
+					0
+				],
+				"sprite": 520903033
 			},
 			{
 				"begin": 2,
-				"end": -1,
-				"layer_index": 0,
-				"sprite": {
-					"sprite": 1831732863
-				},
-				"type": "SPRITE"
+				"end": 2,
+				"flip_x": false,
+				"flip_y": false,
+				"offset": [
+					0,
+					0
+				],
+				"sprite": 1831732863
 			},
 			{
 				"begin": 3,
-				"end": -1,
-				"layer_index": 0,
-				"sprite": {
-					"sprite": 3775391287
-				},
-				"type": "SPRITE"
-			}
-		],
-		"frame_count": 4,
-		"frames_per_second": 10,
-		"layers": [
-			{
-				"name": "SPRITES"
+				"end": 3,
+				"flip_x": false,
+				"flip_y": false,
+				"offset": [
+					0,
+					0
+				],
+				"sprite": 3775391287
 			}
 		]
 	},
