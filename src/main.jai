@@ -9,18 +9,32 @@ viewport: PixelPerfectViewport = .{
 // Player
 PlayerState :: struct
 {
-    x: = 0.0;
+    #as using _e: Entity;
+
+    id: = 0;
+    input: = 0.0;
     flip: = false;
     speed: = 15.0;
     animation_player: AnimationPlayer;
 
-    idle_animation: *Animation;
-    walk_animation: *Animation;
+    hitboxes: [..]PoolID(Collider);
+    hurtboxes: [..]PoolID(Collider);
+    pushboxes: [..]PoolID(Collider);
 }
-player: PlayerState;
+// players: [2]PlayerState;
+players: Pool(PlayerState);
+player1: *PlayerState;
+player2: *PlayerState;
+
+
+cosmonaut_idle_animation: *Animation;
+cosmonaut_walk_animation: *Animation;
 
 main :: ()
 {
+    pool_init(*players, 8, false);
+    defer pool_shutdown(*players);
+
     yae_init(YAE_COMPILE_TIME_INFO, 800, 600, "cosmopatate");
     defer yae_shutdown();
 
@@ -29,14 +43,53 @@ main :: ()
     resource_save_to_disk(cosomonaut_aseprite, "./data/aseprite/cosmonaut.json.res");
     defer resource_unload(cosomonaut_aseprite);
 
-    player.idle_animation = get_animation(cosomonaut_aseprite, "idle");
-    player.walk_animation = get_animation(cosomonaut_aseprite, "walk");
+    cosmonaut_idle_animation = get_animation(cosomonaut_aseprite, "idle");
+    cosmonaut_walk_animation = get_animation(cosomonaut_aseprite, "walk");
+
+    _:, player1= pool_add(*players);
+    // player1 = *players[0];
+    player_init(player1);
+    defer player_shutdown(player1);
+
+    _:, player2= pool_add(*players);
+    // player2 = *players[1];
+    player_init(player2);
+    defer player_shutdown(player2);
+    player2.id = 1;
+    player2.position.x = 25;
+    player2.flip = true;
 
     yae_loop(
         // Update
         (dt: float) 
         {
-            player_update(*player, dt);
+            // pre animation
+            for *player: players
+            {
+                player_update_pre_animation(player, dt);
+            }
+
+            // animation
+            for *player: players
+            {
+                animation_player_update(*player.animation_player, dt);
+            }
+
+
+            // post animation
+            for *player: players
+            {
+                player_update_post_animation(player, dt);
+            }
+
+            physics_update(dt);
+
+            // post physics
+            for *player: players
+            {
+                player_update_post_physics(player, dt);
+            }
+
             viewport_update(*viewport);
         },
         // Draw
@@ -48,7 +101,11 @@ main :: ()
 
                 rl.ClearBackground(rl.RAYWHITE);
                 rl.DrawRectangle(-1000, -1000, 2000, 1000, rl.LIGHTGRAY);
-                player_draw(*player);
+
+                for *player: players
+                {
+                    player_draw(player);
+                }
             }
 
             rl.ClearBackground(rl.RED);
@@ -59,45 +116,89 @@ main :: ()
     );
 }
 
-player_update :: (using player: *PlayerState, dt: float)
+BOX_COUNT :: 16;
+
+player_init :: (using player: *PlayerState)
 {
-    // Input
-    direction: = 0.0;
-    if (rl.IsKeyDown(.KEY_RIGHT))
+    for i: 0..BOX_COUNT-1
     {
-        direction += 1.0;
+        pushbox_id: = physics_add_collider(player, 0);
+        hurtbox_id: = physics_add_collider(player, 1);
+        hitbox_id: = physics_add_collider(player, 2);
+
+        get(pushbox_id).enabled = false;
+        get(hurtbox_id).enabled = false;
+        get(hitbox_id).enabled = false;
+
+        array_add(*pushboxes, pushbox_id);
+        array_add(*hurtboxes, hurtbox_id);
+        array_add(*hitboxes, hitbox_id);
     }
-    if (rl.IsKeyDown(.KEY_LEFT))
+}
+
+player_shutdown :: (using player: *PlayerState)
+{
+    for i: 0..BOX_COUNT-1
     {
-        direction -= 1.0;
+        physics_remove_collider(pushboxes[i]);
+        physics_remove_collider(hurtboxes[i]);
+        physics_remove_collider(hitboxes[i]);
     }
 
-    // Move
-    x += direction * speed * dt;
-    if direction > 0
+    array_reset(*hitboxes);
+    array_reset(*hurtboxes);
+    array_reset(*pushboxes);
+}
+
+player_update_pre_animation :: (using player: *PlayerState, dt: float)
+{
+    // Input
+    input = 0.0;
+    if id == 0
     {
-        flip = false;
-    }
-    else if direction < 0
-    {
-        flip = true;
+        if (rl.IsKeyDown(.KEY_RIGHT))
+        {
+            input += 1.0;
+        }
+        if (rl.IsKeyDown(.KEY_LEFT))
+        {
+            input -= 1.0;
+        }
     }
 
     // Animation
-    if direction == 0
+    if input == 0.0
     {
-        animation_player_play(*animation_player, idle_animation);
+        animation_player_play(*animation_player, cosmonaut_idle_animation);
     }
     else
     {
-        animation_player_play(*animation_player, walk_animation);
+        animation_player_play(*animation_player, cosmonaut_walk_animation);
+        if input > 0
+        {
+            flip = false;
+        }
+        else if input < 0
+        {
+            flip = true;
+        }
     }
-    animation_player_update(*animation_player, dt);
+}
+
+player_update_post_animation :: (using player: *PlayerState, dt: float)
+{
+    // Move
+    position.x += input * speed * dt;
+}
+
+player_update_post_physics :: (using player: *PlayerState, dt: float)
+{
+
 }
 
 player_draw :: (using player: *PlayerState)
 {
-    animation_player_draw(*animation_player, .{floor(x), 0}, flip);
+    animation_player_draw(*animation_player, .{floor(position.x), 0}, flip);
 }
 
 // === Imports ===
