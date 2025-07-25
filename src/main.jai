@@ -106,6 +106,8 @@ main :: ()
                 {
                     player_draw(player);
                 }
+
+                physics_draw();
             }
 
             rl.ClearBackground(rl.RED);
@@ -189,6 +191,43 @@ player_update_post_animation :: (using player: *PlayerState, dt: float)
 {
     // Move
     position.x += input * speed * dt;
+
+    for i: 0..BOX_COUNT-1
+    {
+        get(pushboxes[i]).enabled = false;
+        get(hurtboxes[i]).enabled = false;
+        get(hitboxes[i]).enabled = false;
+    }
+
+    pushbox_count, hurtbox_count, hitbox_count: = 0;
+    box_events: = animation_player_get_current_box_events(*animation_player);
+    for box: box_events
+    {
+        pool: *[..]PoolID(Collider);
+        count: *int;
+        if box.layer ==
+        {
+            case 0;
+            {
+                pool = *pushboxes;
+                count = *pushbox_count;
+            }
+            case 1;
+            {
+                pool = *hurtboxes;
+                count = *hurtbox_count;
+            }
+            case 2;
+            {
+                pool = *hitboxes;
+                count = *hitbox_count;
+            }
+        }
+        collider: = get((<<pool)[<<count]);
+        collider.enabled = true;
+        collider.rect = box.rect;
+        <<count += 1;
+    }
 }
 
 player_update_post_physics :: (using player: *PlayerState, dt: float)
