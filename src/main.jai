@@ -109,7 +109,7 @@ main :: ()
                     player_draw(player);
                 }
 
-                physics_draw();
+                editor_draw();
             }
 
             rl.ClearBackground(rl.RED);
