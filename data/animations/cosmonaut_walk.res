@@ -1,5 +1,18 @@
 {
 	"data": {
+		"box_events": [
+			{
+				"begin": 0,
+				"end": 3,
+				"layer": 0,
+				"rect": {
+					"h": 26,
+					"w": 14,
+					"x": 8,
+					"y": 0
+				}
+			}
+		],
 		"frame_count": 4,
 		"frames_per_second": 10,
 		"sprite_events": [

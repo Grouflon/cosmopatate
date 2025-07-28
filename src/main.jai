@@ -46,6 +46,8 @@ main :: ()
     cosmonaut_idle_animation = get_animation(cosomonaut_aseprite, "idle");
     cosmonaut_walk_animation = get_animation(cosomonaut_aseprite, "walk");
 
+    physics_set_layer_response(0, 0, .COLLIDE);
+
     _:, player1= pool_add(*players);
     // player1 = *players[0];
     player_init(player1);
@@ -226,6 +228,8 @@ player_update_post_animation :: (using player: *PlayerState, dt: float)
         collider: = get((<<pool)[<<count]);
         collider.enabled = true;
         collider.rect = box.rect;
+        collider.rect.x -= positive_mod(position.x, 1.0);
+        collider.rect.y -= positive_mod(position.y, 1.0);
         <<count += 1;
     }
 }
@@ -237,7 +241,7 @@ player_update_post_physics :: (using player: *PlayerState, dt: float)
 
 player_draw :: (using player: *PlayerState)
 {
-    animation_player_draw(*animation_player, .{floor(position.x), 0}, flip);
+    animation_player_draw(*animation_player, .{floor(position.x), floor(position.y)}, flip);
 }
 
 // === Imports ===
