@@ -192,7 +192,8 @@ player_update_pre_animation :: (using player: *PlayerState, dt: float)
 player_update_post_animation :: (using player: *PlayerState, dt: float)
 {
     // Move
-    position.x += input * speed * dt;
+    movement: = animation_player.current_movement * Vector2.{ifx flip then -1.0 else 1.0, 1.0};
+    position += Vector3.{movement.x, movement.y, 0};
 
     for i: 0..BOX_COUNT-1
     {
@@ -207,7 +208,7 @@ player_update_post_animation :: (using player: *PlayerState, dt: float)
     {
         pool: *[..]PoolID(Collider);
         count: *int;
-        if box.layer ==
+        if box.physics_layer ==
         {
             case 0;
             {
