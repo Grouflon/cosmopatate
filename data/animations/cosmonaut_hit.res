@@ -1,7 +1,7 @@
 {
 	"box_events": [
 	],
-	"frame_count": 2,
+	"frame_count": 3,
 	"frames_per_second": 10,
 	"movement_events": [
 	],
@@ -16,7 +16,7 @@
 				0
 			],
 			"sprite": {
-				"name": "cosmonaut_jump_0",
+				"name": "cosmonaut_hit_0",
 				"texture": "cosmonaut_texture"
 			}
 		},
@@ -30,7 +30,21 @@
 				0
 			],
 			"sprite": {
-				"name": "cosmonaut_jump_1",
+				"name": "cosmonaut_hit_1",
+				"texture": "cosmonaut_texture"
+			}
+		},
+		{
+			"begin": 2,
+			"end": 2,
+			"flip_x": false,
+			"flip_y": false,
+			"offset": [
+				0,
+				0
+			],
+			"sprite": {
+				"name": "cosmonaut_hit_2",
 				"texture": "cosmonaut_texture"
 			}
 		}

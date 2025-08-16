@@ -1,13 +1,10 @@
 {
-	"data": {
-		"animations": {
-			"idle": 3695493481,
-			"jump": 236895462,
-			"walk": 261119740
-		},
-		"texture": 1944163123
+	"animations": {
+		"hit": "cosmonaut_hit",
+		"idle": "cosmonaut_idle",
+		"jump": "cosmonaut_jump",
+		"punch": "cosmonaut_punch",
+		"walk": "cosmonaut_walk"
 	},
-	"id": 2514761519,
-	"name": "./data/aseprite/cosmonaut.json",
-	"type": "AsepriteFile"
+	"texture": "cosmonaut_texture"
 }

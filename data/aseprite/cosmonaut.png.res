@@ -1,171 +1,212 @@
 {
-	"data": {
-		"sprites": [
-			{
-				"data": {
-					"bounds": {
-						"max": [
-							0,
-							0
-						],
-						"min": [
-							0,
-							0
-						]
-					},
-					"texture": 1944163123
-				},
-				"id": 2404452184,
-				"name": "cosmonaut 13.aseprite",
-				"type": "Sprite"
+	"sprites": [
+		{
+			"bounds": {
+				"max": [
+					36,
+					30
+				],
+				"min": [
+					1,
+					1
+				]
 			},
-			{
-				"data": {
-					"bounds": {
-						"max": [
-							32,
-							32
-						],
-						"min": [
-							0,
-							0
-						]
-					},
-					"texture": 1944163123
-				},
-				"id": 2922764127,
-				"name": "cosmonaut 4.aseprite",
-				"type": "Sprite"
+			"name": "cosmonaut_idle_0"
+		},
+		{
+			"bounds": {
+				"max": [
+					71,
+					30
+				],
+				"min": [
+					36,
+					1
+				]
 			},
-			{
-				"data": {
-					"bounds": {
-						"max": [
-							64,
-							32
-						],
-						"min": [
-							32,
-							0
-						]
-					},
-					"texture": 1944163123
-				},
-				"id": 3012331176,
-				"name": "cosmonaut 7.aseprite",
-				"type": "Sprite"
+			"name": "cosmonaut_idle_5"
+		},
+		{
+			"bounds": {
+				"max": [
+					106,
+					30
+				],
+				"min": [
+					71,
+					1
+				]
 			},
-			{
-				"data": {
-					"bounds": {
-						"max": [
-							96,
-							32
-						],
-						"min": [
-							64,
-							0
-						]
-					},
-					"texture": 1944163123
-				},
-				"id": 1800418174,
-				"name": "cosmonaut 8.aseprite",
-				"type": "Sprite"
+			"name": "cosmonaut_walk_0"
+		},
+		{
+			"bounds": {
+				"max": [
+					141,
+					30
+				],
+				"min": [
+					106,
+					1
+				]
 			},
-			{
-				"data": {
-					"bounds": {
-						"max": [
-							128,
-							32
-						],
-						"min": [
-							96,
-							0
-						]
-					},
-					"texture": 1944163123
-				},
-				"id": 520903033,
-				"name": "cosmonaut 9.aseprite",
-				"type": "Sprite"
+			"name": "cosmonaut_walk_1"
+		},
+		{
+			"bounds": {
+				"max": [
+					36,
+					59
+				],
+				"min": [
+					1,
+					30
+				]
 			},
-			{
-				"data": {
-					"bounds": {
-						"max": [
-							160,
-							32
-						],
-						"min": [
-							128,
-							0
-						]
-					},
-					"texture": 1944163123
-				},
-				"id": 1831732863,
-				"name": "cosmonaut 10.aseprite",
-				"type": "Sprite"
+			"name": "cosmonaut_walk_2"
+		},
+		{
+			"bounds": {
+				"max": [
+					71,
+					59
+				],
+				"min": [
+					36,
+					30
+				]
 			},
-			{
-				"data": {
-					"bounds": {
-						"max": [
-							192,
-							32
-						],
-						"min": [
-							160,
-							0
-						]
-					},
-					"texture": 1944163123
-				},
-				"id": 3775391287,
-				"name": "cosmonaut 11.aseprite",
-				"type": "Sprite"
+			"name": "cosmonaut_walk_3"
+		},
+		{
+			"bounds": {
+				"max": [
+					106,
+					59
+				],
+				"min": [
+					71,
+					30
+				]
 			},
-			{
-				"data": {
-					"bounds": {
-						"max": [
-							224,
-							32
-						],
-						"min": [
-							192,
-							0
-						]
-					},
-					"texture": 1944163123
-				},
-				"id": 2522845946,
-				"name": "cosmonaut 12.aseprite",
-				"type": "Sprite"
+			"name": "cosmonaut_jump_0"
+		},
+		{
+			"bounds": {
+				"max": [
+					141,
+					59
+				],
+				"min": [
+					106,
+					30
+				]
 			},
-			{
-				"data": {
-					"bounds": {
-						"max": [
-							256,
-							32
-						],
-						"min": [
-							224,
-							0
-						]
-					},
-					"texture": 1944163123
-				},
-				"id": 1765713566,
-				"name": "cosmonaut 13.aseprite",
-				"type": "Sprite"
-			}
-		]
-	},
-	"id": 1944163123,
-	"name": "./data/aseprite/cosmonaut.png",
-	"type": "TextureFile"
+			"name": "cosmonaut_jump_1"
+		},
+		{
+			"bounds": {
+				"max": [
+					36,
+					88
+				],
+				"min": [
+					1,
+					59
+				]
+			},
+			"name": "cosmonaut_punch_0"
+		},
+		{
+			"bounds": {
+				"max": [
+					71,
+					88
+				],
+				"min": [
+					36,
+					59
+				]
+			},
+			"name": "cosmonaut_punch_1"
+		},
+		{
+			"bounds": {
+				"max": [
+					106,
+					88
+				],
+				"min": [
+					71,
+					59
+				]
+			},
+			"name": "cosmonaut_punch_2"
+		},
+		{
+			"bounds": {
+				"max": [
+					141,
+					88
+				],
+				"min": [
+					106,
+					59
+				]
+			},
+			"name": "cosmonaut_punch_3"
+		},
+		{
+			"bounds": {
+				"max": [
+					36,
+					117
+				],
+				"min": [
+					1,
+					88
+				]
+			},
+			"name": "cosmonaut_punch_4"
+		},
+		{
+			"bounds": {
+				"max": [
+					71,
+					117
+				],
+				"min": [
+					36,
+					88
+				]
+			},
+			"name": "cosmonaut_hit_0"
+		},
+		{
+			"bounds": {
+				"max": [
+					106,
+					117
+				],
+				"min": [
+					71,
+					88
+				]
+			},
+			"name": "cosmonaut_hit_1"
+		},
+		{
+			"bounds": {
+				"max": [
+					141,
+					117
+				],
+				"min": [
+					106,
+					88
+				]
+			},
+			"name": "cosmonaut_hit_2"
+		}
+	]
 }

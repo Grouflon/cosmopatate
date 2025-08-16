@@ -1,7 +1,7 @@
 {
 	"box_events": [
 	],
-	"frame_count": 4,
+	"frame_count": 5,
 	"frames_per_second": 10,
 	"movement_events": [
 	],
@@ -16,7 +16,7 @@
 				0
 			],
 			"sprite": {
-				"name": "cosmonaut_walk_0",
+				"name": "cosmonaut_punch_0",
 				"texture": "cosmonaut_texture"
 			}
 		},
@@ -30,7 +30,7 @@
 				0
 			],
 			"sprite": {
-				"name": "cosmonaut_walk_1",
+				"name": "cosmonaut_punch_1",
 				"texture": "cosmonaut_texture"
 			}
 		},
@@ -44,7 +44,7 @@
 				0
 			],
 			"sprite": {
-				"name": "cosmonaut_walk_2",
+				"name": "cosmonaut_punch_2",
 				"texture": "cosmonaut_texture"
 			}
 		},
@@ -58,7 +58,21 @@
 				0
 			],
 			"sprite": {
-				"name": "cosmonaut_walk_3",
+				"name": "cosmonaut_punch_3",
+				"texture": "cosmonaut_texture"
+			}
+		},
+		{
+			"begin": 4,
+			"end": 4,
+			"flip_x": false,
+			"flip_y": false,
+			"offset": [
+				0,
+				0
+			],
+			"sprite": {
+				"name": "cosmonaut_punch_4",
 				"texture": "cosmonaut_texture"
 			}
 		}

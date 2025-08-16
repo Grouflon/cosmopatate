@@ -1,3 +1,17 @@
+resources: struct
+{
+    cosmonaut_aseprite: AsepriteFile = .{ path = "./data/aseprite/cosmonaut.json" };
+    cosmonaut_texture: TextureFile = .{ path = "./data/aseprite/cosmonaut.png" };
+
+    cosmonaut_idle: Animation = .{ path = "./data/animations/cosmonaut_idle.res" };
+    cosmonaut_jump: Animation = .{ path = "./data/animations/cosmonaut_jump.res" };
+    cosmonaut_walk: Animation = .{ path = "./data/animations/cosmonaut_walk.res" };
+    cosmonaut_punch: Animation = .{ path = "./data/animations/cosmonaut_punch.res" };
+    cosmonaut_hit: Animation = .{ path = "./data/animations/cosmonaut_hit.res" };
+};
+
+
+
 // Viewport
 viewport: PixelPerfectViewport = .{
     min_render_width = 300,
@@ -7,44 +21,24 @@ viewport: PixelPerfectViewport = .{
 };
 
 // Player
-PlayerState :: struct
-{
-    #as using _e: Entity;
 
-    id: = 0;
-    input: = 0.0;
-    flip: = false;
-    speed: = 15.0;
-    animation_player: AnimationPlayer;
-
-    hitboxes: [..]PoolID(Collider);
-    hurtboxes: [..]PoolID(Collider);
-    pushboxes: [..]PoolID(Collider);
-}
 // players: [2]PlayerState;
 players: Pool(PlayerState);
 player1: *PlayerState;
 player2: *PlayerState;
 
-
-cosmonaut_idle_animation: *Animation;
-cosmonaut_walk_animation: *Animation;
-
 main :: ()
 {
+    register_resources(*resources);
+
     pool_init(*players, 8, false);
     defer pool_shutdown(*players);
 
     yae_init(YAE_COMPILE_TIME_INFO, 800, 600, "cosmopatate");
     defer yae_shutdown();
 
-    // Load data
-    cosomonaut_aseprite, success1: = resource_load(AsepriteFile, "./data/aseprite/cosmonaut.json");
-    resource_save_to_disk(cosomonaut_aseprite, "./data/aseprite/cosmonaut.json.res");
-    defer resource_unload(cosomonaut_aseprite);
-
-    cosmonaut_idle_animation = get_animation(cosomonaut_aseprite, "idle");
-    cosmonaut_walk_animation = get_animation(cosomonaut_aseprite, "walk");
+    load_all_resources();
+    defer unload_all_resources();
 
     physics_set_layer_response(0, 0, .COLLIDE);
 
@@ -120,138 +114,16 @@ main :: ()
     );
 }
 
-BOX_COUNT :: 16;
+#load "player.jai";
 
-player_init :: (using player: *PlayerState)
-{
-    for i: 0..BOX_COUNT-1
-    {
-        pushbox_id: = physics_add_collider(player, 0);
-        hurtbox_id: = physics_add_collider(player, 1);
-        hitbox_id: = physics_add_collider(player, 2);
-
-        get(pushbox_id).enabled = false;
-        get(hurtbox_id).enabled = false;
-        get(hitbox_id).enabled = false;
-
-        array_add(*pushboxes, pushbox_id);
-        array_add(*hurtboxes, hurtbox_id);
-        array_add(*hitboxes, hitbox_id);
-    }
-}
-
-player_shutdown :: (using player: *PlayerState)
-{
-    for i: 0..BOX_COUNT-1
-    {
-        physics_remove_collider(pushboxes[i]);
-        physics_remove_collider(hurtboxes[i]);
-        physics_remove_collider(hitboxes[i]);
-    }
-
-    array_reset(*hitboxes);
-    array_reset(*hurtboxes);
-    array_reset(*pushboxes);
-}
-
-player_update_pre_animation :: (using player: *PlayerState, dt: float)
-{
-    // Input
-    input = 0.0;
-    if id == 0
-    {
-        if (rl.IsKeyDown(.KEY_RIGHT))
-        {
-            input += 1.0;
-        }
-        if (rl.IsKeyDown(.KEY_LEFT))
-        {
-            input -= 1.0;
-        }
-    }
-
-    // Animation
-    if input == 0.0
-    {
-        animation_player_play(*animation_player, cosmonaut_idle_animation);
-    }
-    else
-    {
-        animation_player_play(*animation_player, cosmonaut_walk_animation);
-        if input > 0
-        {
-            flip = false;
-        }
-        else if input < 0
-        {
-            flip = true;
-        }
-    }
-}
-
-player_update_post_animation :: (using player: *PlayerState, dt: float)
-{
-    // Move
-    movement: = animation_player.current_movement * Vector2.{ifx flip then -1.0 else 1.0, 1.0};
-    position += Vector3.{movement.x, movement.y, 0};
-
-    for i: 0..BOX_COUNT-1
-    {
-        get(pushboxes[i]).enabled = false;
-        get(hurtboxes[i]).enabled = false;
-        get(hitboxes[i]).enabled = false;
-    }
-
-    pushbox_count, hurtbox_count, hitbox_count: = 0;
-    box_events: = animation_player_get_current_box_events(*animation_player);
-    for box: box_events
-    {
-        pool: *[..]PoolID(Collider);
-        count: *int;
-        if box.physics_layer ==
-        {
-            case 0;
-            {
-                pool = *pushboxes;
-                count = *pushbox_count;
-            }
-            case 1;
-            {
-                pool = *hurtboxes;
-                count = *hurtbox_count;
-            }
-            case 2;
-            {
-                pool = *hitboxes;
-                count = *hitbox_count;
-            }
-        }
-        collider: = get((<<pool)[<<count]);
-        collider.enabled = true;
-        collider.rect = box.rect;
-        collider.rect.x -= positive_mod(position.x, 1.0);
-        collider.rect.y -= positive_mod(position.y, 1.0);
-        <<count += 1;
-    }
-}
-
-player_update_post_physics :: (using player: *PlayerState, dt: float)
-{
-
-}
-
-player_draw :: (using player: *PlayerState)
-{
-    animation_player_draw(*animation_player, .{floor(position.x), floor(position.y)}, flip);
-}
-
-// === Imports ===
-#scope_file
-
-#import "Math";
 rl :: #import "raylib";
 ImGui :: #import,dir "../modules/yae/modules/ImGui";
 
 // Yae mandatory imports
 #import "Basic"()(MEMORY_DEBUGGER = YAE_DEBUG_MEMORY);
 #import "yae";
+
+// === Imports ===
+#scope_file
+
+#import "Math";
