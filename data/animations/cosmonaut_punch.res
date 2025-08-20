@@ -3,6 +3,17 @@
 	],
 	"frame_count": 5,
 	"frames_per_second": 10,
+	"layers": [
+		{
+			"name": "SPRITES"
+		},
+		{
+			"name": "asdsa"
+		},
+		{
+			"name": "sfasafsfas"
+		}
+	],
 	"movement_events": [
 	],
 	"sprite_events": [
@@ -11,6 +22,7 @@
 			"end": 0,
 			"flip_x": false,
 			"flip_y": false,
+			"layer": 0,
 			"offset": [
 				0,
 				0
@@ -25,6 +37,7 @@
 			"end": 1,
 			"flip_x": false,
 			"flip_y": false,
+			"layer": 0,
 			"offset": [
 				0,
 				0
@@ -39,6 +52,7 @@
 			"end": 2,
 			"flip_x": false,
 			"flip_y": false,
+			"layer": 0,
 			"offset": [
 				0,
 				0
@@ -53,6 +67,7 @@
 			"end": 3,
 			"flip_x": false,
 			"flip_y": false,
+			"layer": 0,
 			"offset": [
 				0,
 				0
@@ -67,6 +82,7 @@
 			"end": 4,
 			"flip_x": false,
 			"flip_y": false,
+			"layer": 0,
 			"offset": [
 				0,
 				0
