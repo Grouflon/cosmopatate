@@ -34,7 +34,7 @@ main :: ()
     pool_init(*players, 8, false);
     defer pool_shutdown(*players);
 
-    yae_init(YAE_COMPILE_TIME_INFO, 800, 600, "cosmopatate");
+    yae_init(*YAE_COMPILE_TIME_INFO, 800, 600, "cosmopatate");
     defer yae_shutdown();
 
     load_all_resources();
