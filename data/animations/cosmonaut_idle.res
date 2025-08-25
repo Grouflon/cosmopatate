@@ -35,6 +35,21 @@
 				}
 			},
 			"type": "SPRITE"
+		},
+		{
+			"begin": 0,
+			"box": {
+				"physics_layer": 0,
+				"rect": {
+					"h": 27,
+					"w": 16,
+					"x": -8,
+					"y": 0
+				}
+			},
+			"end": 7,
+			"layer": 1,
+			"type": "BOX"
 		}
 	],
 	"frame_count": 8,
@@ -42,6 +57,9 @@
 	"layers": [
 		{
 			"name": "aseprite_sync"
+		},
+		{
+			"name": "Boxes"
 		}
 	]
 }
