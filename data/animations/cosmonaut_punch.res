@@ -99,12 +99,6 @@
 		},
 		{
 			"name": "SPRITES"
-		},
-		{
-			"name": "asdsa"
-		},
-		{
-			"name": "sfasafsf"
 		}
 	]
 }
