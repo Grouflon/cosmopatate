@@ -1,11 +1,13 @@
-PlayerState :: struct
+
+Player :: struct
 {
     #as using _e: Entity;
 
     id: = 0;
     input: = 0.0;
     flip: = false;
-    speed: = 15.0;
+    state: PlayerState = .NONE;
+
     animation_player: AnimationPlayer;
 
     hitboxes: [..]PoolID(Collider);
@@ -13,9 +15,18 @@ PlayerState :: struct
     pushboxes: [..]PoolID(Collider);
 }
 
+PlayerState :: enum
+{
+    NONE;
+    IDLE;
+    WALK;
+    PUNCH;
+    HIT;
+}
+
 BOX_COUNT :: 16;
 
-player_init :: (using player: *PlayerState)
+player_init :: (using player: *Player)
 {
     for i: 0..BOX_COUNT-1
     {
@@ -31,9 +42,11 @@ player_init :: (using player: *PlayerState)
         array_add(*hurtboxes, hurtbox_id);
         array_add(*hitboxes, hitbox_id);
     }
+
+    player_set_state(player, .IDLE);
 }
 
-player_shutdown :: (using player: *PlayerState)
+player_shutdown :: (using player: *Player)
 {
     for i: 0..BOX_COUNT-1
     {
@@ -47,10 +60,11 @@ player_shutdown :: (using player: *PlayerState)
     array_reset(*pushboxes);
 }
 
-player_update_pre_animation :: (using player: *PlayerState, dt: float)
+player_update_pre_animation :: (using player: *Player, dt: float)
 {
     // Input
     input = 0.0;
+    punch: = false;
     if id == 0
     {
         if (rl.IsKeyDown(.KEY_RIGHT))
@@ -61,28 +75,82 @@ player_update_pre_animation :: (using player: *PlayerState, dt: float)
         {
             input -= 1.0;
         }
+
+        punch = rl.IsKeyPressed(.KEY_SPACE);
     }
 
-    // Animation
-    if input == 0.0
+    if state ==
     {
-        animation_player_play(*animation_player, *resources.cosmonaut_idle);
-    }
-    else
-    {
-        animation_player_play(*animation_player, *resources.cosmonaut_walk);
-        if input > 0
+        case .IDLE;
         {
-            flip = false;
+            if punch
+            {
+                player_set_state(player, .PUNCH);
+            }
+            else if input != 0
+            {
+                player_set_state(player, .WALK);
+            }
         }
-        else if input < 0
+
+        case .WALK;
         {
-            flip = true;
+            if punch
+            {
+                player_set_state(player, .PUNCH);
+            }
+            else if input == 0
+            {
+                player_set_state(player, .IDLE);
+            }
+            else
+            {
+                flip = input < 0;
+            }
+        }
+
+        case .PUNCH;
+        {
+            if animation_player.current_loop_count > 0
+            {
+                player_set_state(player, .IDLE);
+            }
         }
     }
 }
 
-player_update_post_animation :: (using player: *PlayerState, dt: float)
+player_set_state :: (using player: *Player, new_state: PlayerState)
+{
+    if state == new_state return;
+
+    if state ==
+    {
+
+    }
+
+    state = new_state;
+
+    if state ==
+    {
+        case .IDLE;
+        {
+            animation_player_play(*animation_player, *resources.cosmonaut_idle);
+        }
+
+        case .WALK;
+        {
+            flip = input < 0;
+            animation_player_play(*animation_player, *resources.cosmonaut_walk);
+        }
+
+        case .PUNCH;
+        {
+            animation_player_play(*animation_player, *resources.cosmonaut_punch);
+        }
+    }
+}
+
+player_update_post_animation :: (using player: *Player, dt: float)
 {
     // Move
     movement: = animation_player.current_movement * Vector2.{ifx flip then -1.0 else 1.0, 1.0};
@@ -128,12 +196,12 @@ player_update_post_animation :: (using player: *PlayerState, dt: float)
     }
 }
 
-player_update_post_physics :: (using player: *PlayerState, dt: float)
+player_update_post_physics :: (using player: *Player, dt: float)
 {
 
 }
 
-player_draw :: (using player: *PlayerState)
+player_draw :: (using player: *Player)
 {
     animation_player_draw(*animation_player, .{floor(position.x), floor(position.y)}, flip);
 }

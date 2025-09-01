@@ -111,6 +111,36 @@
 				"y_movement": 0
 			},
 			"type": "MOVEMENT"
+		},
+		{
+			"begin": 0,
+			"box": {
+				"physics_layer": 0,
+				"rect": {
+					"h": 27,
+					"w": 16,
+					"x": -8,
+					"y": 0
+				}
+			},
+			"end": 5,
+			"layer": 2,
+			"type": "BOX"
+		},
+		{
+			"begin": 2,
+			"box": {
+				"physics_layer": 2,
+				"rect": {
+					"h": 10,
+					"w": 16.799999,
+					"x": 4,
+					"y": 12
+				}
+			},
+			"end": 3,
+			"layer": 3,
+			"type": "BOX"
 		}
 	],
 	"frame_count": 6,
@@ -121,6 +151,12 @@
 		},
 		{
 			"name": "MOVEMENT"
+		},
+		{
+			"name": "PUSH"
+		},
+		{
+			"name": "HIT"
 		}
 	],
 	"preview_loop_count": 1

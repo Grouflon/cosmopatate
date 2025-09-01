@@ -22,10 +22,10 @@ viewport: PixelPerfectViewport = .{
 
 // Player
 
-// players: [2]PlayerState;
-players: Pool(PlayerState);
-player1: *PlayerState;
-player2: *PlayerState;
+// players: [2]Player;
+players: Pool(Player);
+player1: *Player;
+player2: *Player;
 
 main :: ()
 {

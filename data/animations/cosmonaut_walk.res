@@ -114,13 +114,13 @@
 	"frames_per_second": 10,
 	"layers": [
 		{
-			"name": "aseprite_sync"
+			"name": "SPRITES"
 		},
 		{
-			"name": "Movement"
+			"name": "MOVEMENT"
 		},
 		{
-			"name": "Box"
+			"name": "PUSH"
 		}
 	],
 	"preview_loop_count": 8
