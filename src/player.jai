@@ -108,8 +108,36 @@ player_update_pre_animation :: (using player: *Player, dt: float)
                 flip = input < 0;
             }
         }
+    }
+}
 
+player_update_post_physics :: (using player: *Player, dt: float)
+{
+    if state != .HIT
+    {
+        for id: pushboxes
+        {
+            pb: = get(id);
+            if !pb.enabled continue;
+
+            if pb.frame_overlaps.count > 0
+            {
+                player_set_state(player, .HIT);
+            }
+        }
+    }
+
+    if state ==
+    {
         case .PUNCH;
+        {
+            if animation_player.current_loop_count > 0
+            {
+                player_set_state(player, .IDLE);
+            }
+        }
+
+        case .HIT;
         {
             if animation_player.current_loop_count > 0
             {
@@ -147,13 +175,19 @@ player_set_state :: (using player: *Player, new_state: PlayerState)
         {
             animation_player_play(*animation_player, *resources.cosmonaut_punch);
         }
+
+        case .HIT;
+        {
+            animation_player_play(*animation_player, *resources.cosmonaut_hit);
+        }
     }
 }
 
 player_update_post_animation :: (using player: *Player, dt: float)
 {
     // Move
-    movement: = animation_player.current_movement * Vector2.{ifx flip then -1.0 else 1.0, 1.0};
+    sign: = ifx flip then -1.0 else 1.0;
+    movement: = animation_player.current_movement * Vector2.{sign, 1.0};
     position += Vector3.{movement.x, movement.y, 0};
 
     for i: 0..BOX_COUNT-1
@@ -192,13 +226,10 @@ player_update_post_animation :: (using player: *Player, dt: float)
         collider.rect = box.rect;
         collider.rect.x -= positive_mod(position.x, 1.0);
         collider.rect.y -= positive_mod(position.y, 1.0);
+        collider.rect.x *= sign;
+        collider.rect.w *= sign;
         <<count += 1;
     }
-}
-
-player_update_post_physics :: (using player: *Player, dt: float)
-{
-
 }
 
 player_draw :: (using player: *Player)

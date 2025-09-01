@@ -101,7 +101,7 @@
 					]
 				},
 				"x_easing": "CIRC_OUT",
-				"x_movement": 3,
+				"x_movement": 4,
 				"y_custom_curve": {
 					"extrapolation": "CLAMP",
 					"points": [

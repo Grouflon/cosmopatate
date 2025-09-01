@@ -41,6 +41,7 @@ main :: ()
     defer unload_all_resources();
 
     physics_set_layer_response(0, 0, .COLLIDE);
+    physics_set_layer_response(0, 2, .OVERLAP);
 
     _:, player1= pool_add(*players);
     // player1 = *players[0];
@@ -98,7 +99,7 @@ main :: ()
                 rl.ClearBackground(rl.RAYWHITE);
                 rl.DrawRectangle(-1000, -1000, 2000, 1000, rl.LIGHTGRAY);
 
-                for *player: players
+                for < *player: players
                 {
                     player_draw(player);
                 }
