@@ -95,32 +95,20 @@
 			"end": 4,
 			"layer": 1,
 			"movement": {
-				"x_movement": {
+				"x_custom_curve": {
 					"extrapolation": "CLAMP",
 					"points": [
-						{
-							"back_tangent": 0,
-							"front_tangent": 3.804112,
-							"position": [
-								0,
-								0
-							]
-						},
-						{
-							"back_tangent": 0.458153,
-							"front_tangent": 0,
-							"position": [
-								1,
-								3
-							]
-						}
 					]
 				},
-				"y_movement": {
+				"x_easing": "CIRC_OUT",
+				"x_movement": 3,
+				"y_custom_curve": {
 					"extrapolation": "CLAMP",
 					"points": [
 					]
-				}
+				},
+				"y_easing": "LINEAR",
+				"y_movement": 0
 			},
 			"type": "MOVEMENT"
 		}
