@@ -134,5 +134,6 @@
 		{
 			"name": "Box"
 		}
-	]
+	],
+	"preview_loop_count": 8
 }
