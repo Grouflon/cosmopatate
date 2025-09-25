@@ -2,6 +2,7 @@
 	"events": [
 		{
 			"begin": 0,
+			"disabled": false,
 			"end": 4,
 			"layer": 0,
 			"sprite": {
@@ -16,10 +17,12 @@
 					"texture": "cosmonaut_texture"
 				}
 			},
-			"type": "SPRITE"
+			"type": "SPRITE",
+			"z_order": 2
 		},
 		{
 			"begin": 5,
+			"disabled": false,
 			"end": 7,
 			"layer": 0,
 			"sprite": {
@@ -34,7 +37,8 @@
 					"texture": "cosmonaut_texture"
 				}
 			},
-			"type": "SPRITE"
+			"type": "SPRITE",
+			"z_order": 0
 		},
 		{
 			"begin": 0,
@@ -47,9 +51,11 @@
 					"y": 0
 				}
 			},
+			"disabled": false,
 			"end": 7,
 			"layer": 1,
-			"type": "BOX"
+			"type": "BOX",
+			"z_order": 1
 		}
 	],
 	"frame_count": 8,
@@ -61,5 +67,6 @@
 		{
 			"name": "Boxes"
 		}
-	]
+	],
+	"preview_loop_count": 1
 }

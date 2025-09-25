@@ -2,6 +2,7 @@
 	"events": [
 		{
 			"begin": 0,
+			"disabled": false,
 			"end": 0,
 			"layer": 0,
 			"sprite": {
@@ -16,10 +17,12 @@
 					"texture": "cosmonaut_texture"
 				}
 			},
-			"type": "SPRITE"
+			"type": "SPRITE",
+			"z_order": 4
 		},
 		{
 			"begin": 1,
+			"disabled": false,
 			"end": 1,
 			"layer": 0,
 			"sprite": {
@@ -34,10 +37,12 @@
 					"texture": "cosmonaut_texture"
 				}
 			},
-			"type": "SPRITE"
+			"type": "SPRITE",
+			"z_order": 0
 		},
 		{
 			"begin": 2,
+			"disabled": false,
 			"end": 2,
 			"layer": 0,
 			"sprite": {
@@ -52,10 +57,12 @@
 					"texture": "cosmonaut_texture"
 				}
 			},
-			"type": "SPRITE"
+			"type": "SPRITE",
+			"z_order": 1
 		},
 		{
 			"begin": 3,
+			"disabled": false,
 			"end": 3,
 			"layer": 0,
 			"sprite": {
@@ -70,10 +77,12 @@
 					"texture": "cosmonaut_texture"
 				}
 			},
-			"type": "SPRITE"
+			"type": "SPRITE",
+			"z_order": 2
 		},
 		{
 			"begin": 0,
+			"disabled": false,
 			"end": 3,
 			"layer": 1,
 			"movement": {
@@ -92,7 +101,8 @@
 				"y_easing": "LINEAR",
 				"y_movement": 0
 			},
-			"type": "MOVEMENT"
+			"type": "MOVEMENT",
+			"z_order": 3
 		},
 		{
 			"begin": 0,
@@ -105,9 +115,11 @@
 					"y": 0
 				}
 			},
+			"disabled": false,
 			"end": 3,
 			"layer": 2,
-			"type": "BOX"
+			"type": "BOX",
+			"z_order": 5
 		}
 	],
 	"frame_count": 4,

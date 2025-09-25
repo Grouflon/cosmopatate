@@ -2,6 +2,7 @@
 	"events": [
 		{
 			"begin": 0,
+			"disabled": false,
 			"end": 0,
 			"layer": 0,
 			"sprite": {
@@ -16,10 +17,12 @@
 					"texture": "cosmonaut_texture"
 				}
 			},
-			"type": "SPRITE"
+			"type": "SPRITE",
+			"z_order": 1
 		},
 		{
 			"begin": 1,
+			"disabled": false,
 			"end": 1,
 			"layer": 0,
 			"sprite": {
@@ -34,7 +37,8 @@
 					"texture": "cosmonaut_texture"
 				}
 			},
-			"type": "SPRITE"
+			"type": "SPRITE",
+			"z_order": 0
 		}
 	],
 	"frame_count": 2,
@@ -43,5 +47,6 @@
 		{
 			"name": "aseprite_sync"
 		}
-	]
+	],
+	"preview_loop_count": 1
 }
