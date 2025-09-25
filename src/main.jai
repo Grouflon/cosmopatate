@@ -10,7 +10,51 @@ resources: struct
     cosmonaut_hit: Animation = .{ path = "./data/animations/cosmonaut_hit.res" };
 };
 
+POST_PROCESS_FS :: #string DONE
+#version 330
 
+// Input vertex attributes (from vertex shader)
+in vec2 fragTexCoord;
+in vec4 fragColor;
+
+// Input uniform values
+uniform sampler2D texture0;
+uniform vec4 colDiffuse;
+
+// Output fragment color
+out vec4 finalColor;
+
+// User uniforms
+uniform vec2 renderSize;
+
+const int SAMPLE_COUNT = 3;
+
+float offset[SAMPLE_COUNT] = float[](0.0, 1.3846153846, 3.2307692308);
+float weight[SAMPLE_COUNT] = float[](0.2270270270, 0.3162162162, 0.0702702703);
+
+void main()
+{
+    // Texel color fetching from texture sampler
+
+    vec4 baseColor = texture(texture0, fragTexCoord);
+    vec3 texelColor = baseColor.rgb*weight[0];
+
+    for (int i = 1; i < SAMPLE_COUNT; i++)
+    {
+        texelColor += texture(texture0, fragTexCoord + vec2(offset[i], offset[i])/renderSize.x, 0.0).rgb*weight[i]*0.5;
+        texelColor += texture(texture0, fragTexCoord + vec2(offset[i], -offset[i])/renderSize.x, 0.0).rgb*weight[i]*0.5;
+        texelColor += texture(texture0, fragTexCoord + vec2(-offset[i], offset[i])/renderSize.x, 0.0).rgb*weight[i]*0.5;
+        texelColor += texture(texture0, fragTexCoord + vec2(-offset[i], -offset[i])/renderSize.x, 0.0).rgb*weight[i]*0.5;
+    }
+
+    finalColor = baseColor;
+    // finalColor = vec4(texelColor, 1.0);
+}
+
+DONE
+
+post_process_shader: rl.Shader;
+post_process_render_size_location: s32;
 
 // Viewport
 viewport: Viewport;
@@ -28,7 +72,7 @@ player2: *Player;
 main :: ()
 {
     register_resources(*resources);
-
+    
     pool_init(*players, 8, false);
     defer pool_shutdown(*players);
 
@@ -39,6 +83,10 @@ main :: ()
 
     load_all_resources();
     defer unload_all_resources();
+
+    post_process_shader = rl.LoadShaderFromMemory(null, POST_PROCESS_FS);
+    post_process_render_size_location = rl.GetShaderLocation(post_process_shader, "renderSize");
+    defer rl.UnloadShader(post_process_shader);
 
     physics_set_layer_response(0, 0, .COLLIDE);
     physics_set_layer_response(0, 2, .OVERLAP);
@@ -117,11 +165,14 @@ main :: ()
 
             rl.ClearBackground(rl.RED);
 
-            draw_width: float = render_width * pixel_ratio;
-            draw_height: float = render_height * pixel_ratio;
+            draw_size: Vector2 = .{ render_width * pixel_ratio, render_height * pixel_ratio };
             source_rect: = rl.Rectangle.{ 0.0, 0.0, render_width, render_height };
-            target_rect: = rl.Rectangle.{ 0.0, 0.0, draw_width, draw_height };
+            target_rect: = rl.Rectangle.{ 0.0, 0.0, draw_size.x, draw_size.y };
+
+            rl.SetShaderValueV(post_process_shader, post_process_render_size_location, *draw_size, xx rl.ShaderUniformDataType.RL_SHADER_UNIFORM_VEC2, 1);
+            rl.BeginShaderMode(post_process_shader);
             rl.DrawTexturePro(viewport.render_texture.texture, source_rect, target_rect, .{0.0, 0.0}, 0.0, rl.WHITE);
+            rl.EndShaderMode();
 
             rl.DrawText("Congrats! You created your first window!", rl.GetScreenWidth() / 2 - 190, 200, 20, rl.LIGHTGRAY);
         }
