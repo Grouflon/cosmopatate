@@ -58,12 +58,8 @@ post_process_render_size_location: s32;
 
 // Viewport
 viewport: Viewport;
-min_pixel_ratio: s32 = 1;
-max_pixel_ratio: s32 = 3;
-min_render_width: s32 = 300;
-min_render_height: s32 = 200;
-// Player
 
+// Player
 // players: [2]Player;
 players: Pool(Player);
 player1: *Player;
@@ -79,7 +75,7 @@ main :: ()
     yae_init(*YAE_COMPILE_TIME_INFO, 800, 600, "cosmopatate");
     defer yae_shutdown();
 
-    rl.SetWindowMinSize(min_render_width * min_pixel_ratio, min_render_height * min_pixel_ratio);
+    rl.SetWindowMinSize(300, 200);
 
     load_all_resources();
     defer unload_all_resources();
@@ -138,15 +134,26 @@ main :: ()
         // Draw
         ()
         {
+            MIN_PIXEL_RATIO :: 1;
+            MAX_PIXEL_RATIO :: 3;
+            MIN_RENDER_WIDTH :: 300;
+            MIN_RENDER_HEIGHT :: 200;
+
             window_width: = rl.GetRenderWidth();
             window_height: = rl.GetRenderHeight();
 
-            pixel_ratio: = xx min(window_width / min_render_width, window_height / min_render_height);
-            pixel_ratio = clamp(pixel_ratio, min_pixel_ratio, max_pixel_ratio);
+            pixel_ratio: = xx min(window_width / MIN_RENDER_WIDTH, window_height / MIN_RENDER_HEIGHT);
+            pixel_ratio = clamp(pixel_ratio, MIN_PIXEL_RATIO, MAX_PIXEL_RATIO);
 
-            render_width: = cast(float)window_width / cast(float)pixel_ratio;
-            render_height: = cast(float)window_height / cast(float)pixel_ratio;
-            viewport_update(*viewport, .{ render_width, render_height });
+            render_size: Vector2 = .{ cast(float)window_width / cast(float)pixel_ratio, cast(float)window_height / cast(float)pixel_ratio };
+            draw_size: Vector2 = .{ render_size.x * pixel_ratio, render_size.y * pixel_ratio };
+
+            source_rect: = Rect.{ 0.0, 0.0, render_size.x, render_size.y };
+            target_rect: = Rect.{ 0.0, 0.0, draw_size.x, draw_size.y };
+
+            viewport_update(*viewport, render_size);
+
+            world_mouse_position: = viewport_screen_to_world_position(*viewport, target_rect, rl.GetMousePosition());
 
             {
                 viewport_begin_render(*viewport);
@@ -161,17 +168,15 @@ main :: ()
                 }
 
                 editor_draw();
+
+                rl.DrawCircleV(world_mouse_position, 5, rl.RED);
             }
 
             rl.ClearBackground(rl.RED);
 
-            draw_size: Vector2 = .{ render_width * pixel_ratio, render_height * pixel_ratio };
-            source_rect: = rl.Rectangle.{ 0.0, 0.0, render_width, render_height };
-            target_rect: = rl.Rectangle.{ 0.0, 0.0, draw_size.x, draw_size.y };
-
             rl.SetShaderValueV(post_process_shader, post_process_render_size_location, *draw_size, xx rl.ShaderUniformDataType.RL_SHADER_UNIFORM_VEC2, 1);
             rl.BeginShaderMode(post_process_shader);
-            rl.DrawTexturePro(viewport.render_texture.texture, source_rect, target_rect, .{0.0, 0.0}, 0.0, rl.WHITE);
+            rl.DrawTexturePro(viewport.render_texture.texture, <<(cast(*rl.Rectangle)*source_rect), <<(cast(*rl.Rectangle)*target_rect), .{0.0, 0.0}, 0.0, rl.WHITE);
             rl.EndShaderMode();
 
             rl.DrawText("Congrats! You created your first window!", rl.GetScreenWidth() / 2 - 190, 200, 20, rl.LIGHTGRAY);
