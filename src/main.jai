@@ -7,6 +7,7 @@ resources: struct
     cosmonaut_jump: Animation = .{ path = "./data/animations/cosmonaut_jump.res" };
     cosmonaut_walk: Animation = .{ path = "./data/animations/cosmonaut_walk.res" };
     cosmonaut_punch: Animation = .{ path = "./data/animations/cosmonaut_punch.res" };
+    cosmonaut_kick: Animation = .{ path = "./data/animations/cosmonaut_kick.res" };
     cosmonaut_hit: Animation = .{ path = "./data/animations/cosmonaut_hit.res" };
 
     post_process_shader: Shader = .{ vs_path = "", fs_path = "./data/shaders/post_process.fs" };

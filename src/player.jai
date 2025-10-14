@@ -8,6 +8,7 @@ Player :: struct
     flip: = false;
     state: PlayerState = .NONE;
 
+    next_attack_animation: *Animation;
     animation_player: AnimationPlayer;
 
     hitboxes: [..]PoolID(Collider);
@@ -20,7 +21,7 @@ PlayerState :: enum
     NONE;
     IDLE;
     WALK;
-    PUNCH;
+    ATTACK;
     HIT;
 }
 
@@ -65,6 +66,7 @@ player_update_pre_animation :: (using player: *Player, dt: float)
     // Input
     input = 0.0;
     punch: = false;
+    kick: = false;
     if id == 0
     {
         if (rl.IsKeyDown(.KEY_RIGHT))
@@ -76,7 +78,8 @@ player_update_pre_animation :: (using player: *Player, dt: float)
             input -= 1.0;
         }
 
-        punch = rl.IsKeyPressed(.KEY_SPACE);
+        punch = rl.IsKeyPressed(.KEY_K);
+        kick = rl.IsKeyPressed(.KEY_L);
     }
 
     if state ==
@@ -85,7 +88,13 @@ player_update_pre_animation :: (using player: *Player, dt: float)
         {
             if punch
             {
-                player_set_state(player, .PUNCH);
+                next_attack_animation = *resources.cosmonaut_punch;
+                player_set_state(player, .ATTACK);
+            }
+            else if kick
+            {
+                next_attack_animation = *resources.cosmonaut_kick;
+                player_set_state(player, .ATTACK);
             }
             else if input != 0
             {
@@ -97,7 +106,13 @@ player_update_pre_animation :: (using player: *Player, dt: float)
         {
             if punch
             {
-                player_set_state(player, .PUNCH);
+                next_attack_animation = *resources.cosmonaut_punch;
+                player_set_state(player, .ATTACK);
+            }
+            else if kick
+            {
+                next_attack_animation = *resources.cosmonaut_kick;
+                player_set_state(player, .ATTACK);
             }
             else if input == 0
             {
@@ -129,7 +144,7 @@ player_update_post_physics :: (using player: *Player, dt: float)
 
     if state ==
     {
-        case .PUNCH;
+        case .ATTACK;
         {
             if animation_player.current_loop_count > 0
             {
@@ -171,9 +186,10 @@ player_set_state :: (using player: *Player, new_state: PlayerState)
             animation_player_play(*animation_player, *resources.cosmonaut_walk);
         }
 
-        case .PUNCH;
+        case .ATTACK;
         {
-            animation_player_play(*animation_player, *resources.cosmonaut_punch);
+            animation_player_play(*animation_player, next_attack_animation);
+            next_attack_animation = null;
         }
 
         case .HIT;
