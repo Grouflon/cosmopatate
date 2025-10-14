@@ -8,53 +8,13 @@ resources: struct
     cosmonaut_walk: Animation = .{ path = "./data/animations/cosmonaut_walk.res" };
     cosmonaut_punch: Animation = .{ path = "./data/animations/cosmonaut_punch.res" };
     cosmonaut_hit: Animation = .{ path = "./data/animations/cosmonaut_hit.res" };
+
+    post_process_shader: Shader = .{ vs_path = "", fs_path = "./data/shaders/post_process.fs" };
 };
 
-POST_PROCESS_FS :: #string DONE
-#version 330
-
-// Input vertex attributes (from vertex shader)
-in vec2 fragTexCoord;
-in vec4 fragColor;
-
-// Input uniform values
-uniform sampler2D texture0;
-uniform vec4 colDiffuse;
-
-// Output fragment color
-out vec4 finalColor;
-
-// User uniforms
-uniform vec2 renderSize;
-
-const int SAMPLE_COUNT = 3;
-
-float offset[SAMPLE_COUNT] = float[](0.0, 1.3846153846, 3.2307692308);
-float weight[SAMPLE_COUNT] = float[](0.2270270270, 0.3162162162, 0.0702702703);
-
-void main()
+game_settings: struct
 {
-    // Texel color fetching from texture sampler
-
-    vec4 baseColor = texture(texture0, fragTexCoord);
-    vec3 texelColor = baseColor.rgb*weight[0];
-
-    for (int i = 1; i < SAMPLE_COUNT; i++)
-    {
-        texelColor += texture(texture0, fragTexCoord + vec2(offset[i], offset[i])/renderSize.x, 0.0).rgb*weight[i]*0.5;
-        texelColor += texture(texture0, fragTexCoord + vec2(offset[i], -offset[i])/renderSize.x, 0.0).rgb*weight[i]*0.5;
-        texelColor += texture(texture0, fragTexCoord + vec2(-offset[i], offset[i])/renderSize.x, 0.0).rgb*weight[i]*0.5;
-        texelColor += texture(texture0, fragTexCoord + vec2(-offset[i], -offset[i])/renderSize.x, 0.0).rgb*weight[i]*0.5;
-    }
-
-    finalColor = baseColor;
-    // finalColor = vec4(texelColor, 1.0);
 }
-
-DONE
-
-post_process_shader: rl.Shader;
-post_process_render_size_location: s32;
 
 // Viewport
 viewport: Viewport;
@@ -72,17 +32,17 @@ main :: ()
     pool_init(*players, 8, false);
     defer pool_shutdown(*players);
 
+    register_settings_section("game", *game_settings);
+    defer unregister_settings_section("game");
+
+    // rl.SetConfigFlags(xx rl.ConfigFlags.FLAG_MSAA_4X_HINT);
+
     yae_init(*YAE_COMPILE_TIME_INFO, 800, 600, "cosmopatate");
     defer yae_shutdown();
-
     rl.SetWindowMinSize(300, 200);
 
     load_all_resources();
     defer unload_all_resources();
-
-    post_process_shader = rl.LoadShaderFromMemory(null, POST_PROCESS_FS);
-    post_process_render_size_location = rl.GetShaderLocation(post_process_shader, "renderSize");
-    defer rl.UnloadShader(post_process_shader);
 
     physics_set_layer_response(0, 0, .COLLIDE);
     physics_set_layer_response(0, 2, .OVERLAP);
@@ -135,9 +95,11 @@ main :: ()
         ()
         {
             MIN_PIXEL_RATIO :: 1;
-            MAX_PIXEL_RATIO :: 3;
+            MAX_PIXEL_RATIO :: 32;
             MIN_RENDER_WIDTH :: 300;
             MIN_RENDER_HEIGHT :: 200;
+
+            ImGui_EditValue("game_settings", *game_settings);
 
             window_width: = rl.GetRenderWidth();
             window_height: = rl.GetRenderHeight();
@@ -145,21 +107,23 @@ main :: ()
             pixel_ratio: = xx min(window_width / MIN_RENDER_WIDTH, window_height / MIN_RENDER_HEIGHT);
             pixel_ratio = clamp(pixel_ratio, MIN_PIXEL_RATIO, MAX_PIXEL_RATIO);
 
-            render_size: Vector2 = .{ cast(float)window_width / cast(float)pixel_ratio, cast(float)window_height / cast(float)pixel_ratio };
-            draw_size: Vector2 = .{ render_size.x * pixel_ratio, render_size.y * pixel_ratio };
+            game_size: Vector2 = .{ cast(float)window_width / cast(float)pixel_ratio, cast(float)window_height / cast(float)pixel_ratio };
+            final_size: Vector2 = .{ game_size.x * pixel_ratio, game_size.y * pixel_ratio };
 
-            source_rect: = Rect.{ 0.0, 0.0, render_size.x, render_size.y };
-            target_rect: = Rect.{ 0.0, 0.0, draw_size.x, draw_size.y };
+            viewport_update(*viewport, game_size);
+            game_size = size(viewport);
 
-            viewport_update(*viewport, render_size);
+            source_rect: = Rect.{ 0.0, 0.0, game_size.x, game_size.y };
+            target_rect: = Rect.{ 0.0, 0.0, final_size.x, final_size.y };
 
             world_mouse_position: = viewport_screen_to_world_position(*viewport, target_rect, rl.GetMousePosition());
 
             {
-                viewport_begin_render(*viewport);
-                defer viewport_end_render(*viewport);
+                viewport_begin_render(viewport);
+                defer viewport_end_render(viewport);
 
                 rl.ClearBackground(rl.RAYWHITE);
+
                 rl.DrawRectangle(-1000, -1000, 2000, 1000, rl.LIGHTGRAY);
 
                 for < *player: players
@@ -169,19 +133,28 @@ main :: ()
 
                 editor_draw();
 
-                rl.DrawCircleV(world_mouse_position, 5, rl.RED);
+                // draw_antialiased_circle(world_mouse_position, 3 + normalized_sin(yae.time) * 7, rl.RED);
             }
 
             rl.ClearBackground(rl.RED);
 
-            rl.SetShaderValueV(post_process_shader, post_process_render_size_location, *draw_size, xx rl.ShaderUniformDataType.RL_SHADER_UNIFORM_VEC2, 1);
-            rl.BeginShaderMode(post_process_shader);
-            rl.DrawTexturePro(viewport.render_texture.texture, <<(cast(*rl.Rectangle)*source_rect), <<(cast(*rl.Rectangle)*target_rect), .{0.0, 0.0}, 0.0, rl.WHITE);
-            rl.EndShaderMode();
+            {
+                shader_begin_draw(*resources.post_process_shader);
+                defer shader_end_draw(*resources.post_process_shader);
+
+                // shader_set_uniform(*resources.post_process_shader, "thickness", game_settings.thickness);
+                shader_set_uniform(*resources.post_process_shader, "textureSize", game_size);
+                shader_set_uniform(*resources.post_process_shader, "renderSize", final_size);
+
+                rl.DrawTexturePro(viewport.render_texture.texture, <<(cast(*rl.Rectangle)*source_rect), <<(cast(*rl.Rectangle)*target_rect), .{0.0, 0.0}, 0.0, rl.WHITE);
+            }
 
             rl.DrawText("Congrats! You created your first window!", rl.GetScreenWidth() / 2 - 190, 200, 20, rl.LIGHTGRAY);
         }
     );
+
+    // @NOTE(remi): Do we even need that? for some reason this is not flagged as a leak
+    // free_string_hash_repository();
 }
 
 #load "player.jai";
