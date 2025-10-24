@@ -112,7 +112,7 @@ main :: ()
             final_size: Vector2 = .{ game_size.x * pixel_ratio, game_size.y * pixel_ratio };
 
             viewport_update(*viewport, game_size);
-            game_size = size(viewport);
+            game_size = size(*viewport);
 
             source_rect: = Rect.{ 0.0, 0.0, game_size.x, game_size.y };
             target_rect: = Rect.{ 0.0, 0.0, final_size.x, final_size.y };
@@ -120,8 +120,8 @@ main :: ()
             world_mouse_position: = viewport_screen_to_world_position(*viewport, target_rect, rl.GetMousePosition());
 
             {
-                viewport_begin_render(viewport);
-                defer viewport_end_render(viewport);
+                viewport_begin_render(*viewport);
+                defer viewport_end_render(*viewport);
 
                 rl.ClearBackground(rl.RAYWHITE);
 
