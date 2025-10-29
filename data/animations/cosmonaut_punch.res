@@ -42,7 +42,7 @@
 		},
 		{
 			"begin": 2,
-			"disabled": true,
+			"disabled": false,
 			"end": 4,
 			"layer": 1,
 			"movement": {
